@@ -1,0 +1,134 @@
+html, body{
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  font-family: Inter, sans-serif;
+  background-color: black;
+  background-image: url('../assets/images/patrika-gate-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+p{
+  color: white;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.title-bar{
+  display: flex;
+  height: 2em;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2em;
+  padding: 1em 1em;
+  margin: 0;
+  background: transparent;
+  backdrop-filter: blur(5px);
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.8);
+  transition: backdrop-filter 0.2s;
+}
+
+.title-bar:hover{
+  backdrop-filter: blur(8px);
+}
+
+.resmanager-heading{
+  color: white;
+  font-size: 1.25em;
+}
+
+.title-tagline{
+  font-size: 1em;
+  color: white;
+  font-weight: 600;
+}
+
+.login-card-container{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.login-card{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(30, 30, 30);
+  border-radius: 0.75em;
+  padding: 1em;
+  transition: box-shadow 0.25s, backdrop-filter 0.3s;
+  background: transparent;
+  backdrop-filter: blur(12px);
+}
+
+.login-card:hover{
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
+}
+
+.welcome-heading{
+  font-size: 2rem;
+  color: white;
+  padding: 0;
+  margin: 0;
+}
+
+.instruction-para{
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+  padding: 0;
+  margin: 1rem;
+}
+
+.microsoft-sign-in{
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  color: white;
+  background-color: rgb(0, 120, 212);
+  border: none;
+  padding: 0.75em;
+  border-radius: 0.75em;
+  transition: background-color 0.25s, box-shadow 0.25s;
+}
+
+.microsoft-sign-in:hover{
+  cursor: pointer;
+  background-color: rgb(43, 141, 216);
+  box-shadow: 0px 0px 6px rgb(0, 0, 0, 0.5);
+}
+
+.microsoft-sign-in:active{
+  background-color: rgb(97, 175, 235);
+}
+
+.footer-credit{
+  font-size: 0.75em;
+  padding-left: 1.5em;
+  padding-bottom: 0.5em;
+  color: rgb(148, 148, 148);
+  font-weight: 500;
+  transition: color 0.25s;
+}
+
+.footer-credit:hover{
+  color: rgb(236, 236, 236);
+}
