@@ -1,0 +1,79 @@
+html, body{
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  font-family: Inter, sans-serif;
+  background-color: black;
+}
+
+p{
+  color: white;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.header-bar{
+  display: flex;
+  height: 2em;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2em;
+  padding: 1em 1em;
+  margin: 0;
+  background: transparent;
+  backdrop-filter: blur(5px);
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.8);
+  transition: backdrop-filter 0.2s;
+}
+
+.header-bar:hover{
+  backdrop-filter: blur(8px);
+}
+
+.header-box-1,
+.header-box-2{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1em;
+}
+
+.resmanager-heading{
+  color: white;
+  font-size: 1.25em;
+}
+
+.sidebar-toggle,
+.profile-button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: black;
+  border: none;
+  cursor: pointer;
+  height: 2.5em;
+  width: 2.5em;
+  padding: 0;
+  border-radius: 0.5em;
+  transition: background-color 0.2s;
+}
+
+.profile-button{
+  border-radius: 50%;
+}
+
+.sidebar-toggle:hover,
+.profile-button:hover{
+  background-color: rgb(44, 44, 44);
+}
+
+.username{
+  font-size: 1em;
+  font-weight: 600;
+}
+

@@ -73,10 +73,10 @@ p{
   justify-content: center;
   background-color: rgb(30, 30, 30);
   border-radius: 0.75em;
-  padding: 1em;
+  padding: 2em;
   transition: box-shadow 0.25s, backdrop-filter 0.3s;
   background: transparent;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
 }
 
 .login-card:hover{
