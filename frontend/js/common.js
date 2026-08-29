@@ -19,6 +19,7 @@ function setupProfileDropdown(){
   });
 }
 
+// Interactivity for the sidebar
 function setupSidebarToggle(){
   const sidebar=document.querySelector('.sidebar');
   const sidebarToggle=document.querySelector('.sidebar-toggle');

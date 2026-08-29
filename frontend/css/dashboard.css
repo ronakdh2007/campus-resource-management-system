@@ -1,0 +1,142 @@
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.page-content {
+  margin-left: 200px;   /* match sidebar expanded width */
+  padding: 2em 3em;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.welcome-heading {
+  color: white;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 1.5em;
+}
+
+.username-highlight {
+  color: rgb(0, 160, 255);
+}
+
+.dashboard-section {
+  margin-bottom: 2.5em;
+}
+
+.section-heading-link {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.section-heading-link h2 {
+  color: white;
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 0.75em;
+  transition: color 0.2s;
+}
+
+.section-heading-link {
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;   /* needed so the underline only spans the heading's own width */
+}
+
+.section-heading-link h2 {
+  color: white;
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 0.75em;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.1em;
+  transition: transform 0.2s ease;
+}
+
+.section-heading-link:hover h2 {
+  transform: translateX(0.15em);
+}
+
+.section-heading-link h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 0.1em;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.section-heading-link:hover h2::after {
+  width: 100%;
+}
+
+.stat-cards {
+  display: flex;
+  gap: 1.5em;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.75em;
+  padding: 1.5em 2em;
+  min-width: 10em;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-0.25em);
+  box-shadow: 0 0 1.5em rgba(0, 160, 255, 0.25);
+  border-color: white;
+}
+
+.stat-label {
+  color: rgb(170, 170, 170);
+  font-size: 0.95em;
+  font-weight: 600;
+  margin: 0 0 0.4em 0;
+}
+
+.stat-number {
+  color: white;
+  font-size: 2em;
+  font-weight: 700;
+  margin: 0;
+}
+
+.next-booking-prompt {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.75em;
+  padding: 1.5em 2em;
+  margin-bottom: 2.5em;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.next-booking-prompt:hover {
+  transform: translateY(-0.2em);
+  box-shadow: 0 0 1.5em rgba(0, 160, 255, 0.25);
+  border-color: white;
+}
+
+.next-booking-prompt h2 {
+  color: white;
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 0;
+}
+
+.footer-credit {
+  font-size: 1em;
+  color: rgb(148, 148, 148);
+  font-weight: 500;
+  margin-top: 3em;
+}
