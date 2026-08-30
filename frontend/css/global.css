@@ -244,6 +244,10 @@ p{
   max-width: 0;
 }
 
+.sidebar.collapsed .sidebar-links {
+  padding: 0.5em 0.375em;
+}
+
 .hidden{
   display: none;
 }
