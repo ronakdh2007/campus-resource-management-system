@@ -7,14 +7,15 @@ const resources=[
 ];
 
 // For resource rendering
-function renderResources() {
+function renderResources(list) {
+  const dataToRender = list || resources;
   const grid = document.querySelector('#resource-grid');
   const countDisplay = document.querySelector('#resource-count');
 
-  countDisplay.textContent = resources.length;
+  countDisplay.textContent = dataToRender.length;
 
-  let cardsHTML='';
-  resources.forEach(function (resource) {
+  let cardsHTML = '';
+  dataToRender.forEach(function (resource) {
     cardsHTML += `
       <div class="resource-card">
         <h3>${resource.resource_code}</h3>
@@ -28,7 +29,7 @@ function renderResources() {
     `;
   });
 
-  grid.innerHTML=cardsHTML;
+  grid.innerHTML = cardsHTML;
 }
 
 // For resource modal
@@ -162,6 +163,161 @@ function setupSlotDropdown() {
   });
 }
 
+function getUniqueValues(field) {
+  const values = resources.map(function (r) { return r[field]; });
+  return Array.from(new Set(values));
+}
+
+function populateCheckboxSubdropdown(containerId, values, groupName) {
+  const container = document.querySelector('#' + containerId);
+  let html = '';
+  values.forEach(function (value, index) {
+    html += `<label class="filter-checkbox-row">
+      <input type="checkbox" class="sub-filter-checkbox" data-group="${groupName}" value="${value}"> ${value}
+    </label>`;
+  });
+  container.innerHTML = html;
+}
+
+function getCheckedValues(groupName) {
+  const checked = document.querySelectorAll('.sub-filter-checkbox[data-group="' + groupName + '"]:checked');
+  return Array.from(checked).map(function (cb) { return cb.value; });
+}
+
+function applyFilters() {
+  let filtered = resources;
+
+  const selectedBuildings = getCheckedValues('building');
+  const selectedRoomTypes = getCheckedValues('roomType');
+  const selectedStatuses = getCheckedValues('status');
+  const minCapacity = document.querySelector('#capacity-min').value;
+  const maxCapacity = document.querySelector('#capacity-max').value;
+
+  if (selectedBuildings.length > 0) {
+    filtered = filtered.filter(function (r) { return selectedBuildings.includes(r.building); });
+  }
+  if (selectedRoomTypes.length > 0) {
+    filtered = filtered.filter(function (r) { return selectedRoomTypes.includes(r.resource_type); });
+  }
+  if (selectedStatuses.length > 0) {
+    filtered = filtered.filter(function (r) { return selectedStatuses.includes(r.status); });
+  }
+  if (minCapacity) {
+    filtered = filtered.filter(function (r) { return r.capacity >= Number(minCapacity); });
+  }
+  if (maxCapacity) {
+    filtered = filtered.filter(function (r) { return r.capacity <= Number(maxCapacity); });
+  }
+
+  renderResources(filtered);
+}
+
+function setupFilters() {
+  const filterToggle = document.querySelector('#filter-toggle');
+  const filterDropdown = document.querySelector('#filter-dropdown');
+  const filterContainer = document.querySelector('#filter-container');
+  const noFilterCheckbox = document.querySelector('#filter-nofilter');
+  const typeCheckboxes = document.querySelectorAll('.filter-type-checkbox');
+
+  populateCheckboxSubdropdown('subdropdown-building', getUniqueValues('building'), 'building');
+  populateCheckboxSubdropdown('subdropdown-roomType', getUniqueValues('resource_type'), 'roomType');
+  populateCheckboxSubdropdown('subdropdown-status', getUniqueValues('status'), 'status');
+
+  filterToggle.addEventListener('click', function () {
+    filterDropdown.classList.toggle('open');
+    filterToggle.classList.toggle('active');
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!filterContainer.contains(event.target)) {
+      filterDropdown.classList.remove('open');
+      filterToggle.classList.remove('active');
+      document.querySelectorAll('.filter-subdropdown').forEach(function (sd) {
+        sd.classList.remove('open');
+      });
+    }
+  });
+
+  typeCheckboxes.forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
+      document.querySelectorAll('.filter-subdropdown').forEach(function (sd) {
+        sd.classList.remove('open');
+      });
+
+      const type = checkbox.getAttribute('data-type');
+      if (checkbox.checked) {
+        document.querySelector('#subdropdown-' + type).classList.add('open');
+        noFilterCheckbox.checked = false;
+      }
+
+      applyFilters();
+    });
+  });
+
+  noFilterCheckbox.addEventListener('change', function () {
+    if (noFilterCheckbox.checked) {
+      typeCheckboxes.forEach(function (cb) { cb.checked = false; });
+      document.querySelectorAll('.sub-filter-checkbox').forEach(function (cb) { cb.checked = false; });
+      document.querySelector('#capacity-min').value = '';
+      document.querySelector('#capacity-max').value = '';
+      document.querySelectorAll('.filter-subdropdown').forEach(function (sd) { sd.classList.remove('open'); });
+      applyFilters();
+    }
+  });
+
+  filterDropdown.addEventListener('change', function (event) {
+    if (event.target.classList.contains('sub-filter-checkbox') || event.target.classList.contains('capacity-input')) {
+      applyFilters();
+    }
+  });
+}
+
+function setupSearch() {
+  const searchInput = document.querySelector('.search-input');
+
+  searchInput.addEventListener('input', function () {
+    applyFilters();
+  });
+}
+
+function applyFilters() {
+  let filtered = resources;
+
+  const searchTerm = document.querySelector('.search-input').value.toLowerCase().trim();
+  const selectedBuildings = getCheckedValues('building');
+  const selectedRoomTypes = getCheckedValues('roomType');
+  const selectedStatuses = getCheckedValues('status');
+  const minCapacity = document.querySelector('#capacity-min').value;
+  const maxCapacity = document.querySelector('#capacity-max').value;
+
+  if (searchTerm) {
+    filtered = filtered.filter(function (r) {
+      return r.resource_code.toLowerCase().includes(searchTerm) ||
+             r.resource_type.toLowerCase().includes(searchTerm) ||
+             r.building.toLowerCase().includes(searchTerm);
+    });
+  }
+  if (selectedBuildings.length > 0) {
+    filtered = filtered.filter(function (r) { return selectedBuildings.includes(r.building); });
+  }
+  if (selectedRoomTypes.length > 0) {
+    filtered = filtered.filter(function (r) { return selectedRoomTypes.includes(r.resource_type); });
+  }
+  if (selectedStatuses.length > 0) {
+    filtered = filtered.filter(function (r) { return selectedStatuses.includes(r.status); });
+  }
+  if (minCapacity) {
+    filtered = filtered.filter(function (r) { return r.capacity >= Number(minCapacity); });
+  }
+  if (maxCapacity) {
+    filtered = filtered.filter(function (r) { return r.capacity <= Number(maxCapacity); });
+  }
+
+  renderResources(filtered);
+}
+
 renderResources();
 setupResourceModal();
 setupSlotDropdown();
+setupFilters();
+setupSearch();

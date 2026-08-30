@@ -73,6 +73,7 @@
         </a>
       </li>
     </ul>
+    <p class="sidebar-credit">Created by Ronak & Garv</p>
   </nav>
   
   <!-- Main Page Content -->
@@ -82,7 +83,51 @@
 
     <div class="search-filter-bar">
       <input type="text" class="search-input" placeholder="Search Resources...">
-      <button class="filter-button">Filter</button>
+      <div class="filter-container" id="filter-container">
+        <button class="filter-button" id="filter-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal-icon lucide-sliders-horizontal"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></svg>
+          Filter
+        </button>
+
+        <div class="filter-dropdown" id="filter-dropdown">
+          <p class="slot-dropdown-hint">Apply one or more filters</p>
+
+          <label class="filter-checkbox-row">
+            <input type="checkbox" id="filter-nofilter"> No Filter
+          </label>
+
+          <div class="filter-type-row">
+            <label class="filter-checkbox-row">
+              <input type="checkbox" class="filter-type-checkbox" data-type="building"> Building
+            </label>
+            <div class="filter-subdropdown" id="subdropdown-building"></div>
+          </div>
+
+          <div class="filter-type-row">
+            <label class="filter-checkbox-row">
+              <input type="checkbox" class="filter-type-checkbox" data-type="roomType"> Room Type
+            </label>
+            <div class="filter-subdropdown" id="subdropdown-roomType"></div>
+          </div>
+
+          <div class="filter-type-row">
+            <label class="filter-checkbox-row">
+              <input type="checkbox" class="filter-type-checkbox" data-type="capacity"> Capacity
+            </label>
+            <div class="filter-subdropdown" id="subdropdown-capacity">
+              <input type="number" class="capacity-input" id="capacity-min" placeholder="Min">
+              <input type="number" class="capacity-input" id="capacity-max" placeholder="Max">
+            </div>
+          </div>
+
+          <div class="filter-type-row">
+            <label class="filter-checkbox-row">
+              <input type="checkbox" class="filter-type-checkbox" data-type="status"> Status
+            </label>
+            <div class="filter-subdropdown" id="subdropdown-status"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <p class="results-count"><span id="resource-count">0</span> Resources Found</p>
@@ -90,8 +135,6 @@
     <div class="resource-grid" id="resource-grid">
       <!-- cards get inserted here by JS -->
     </div>
-
-    <p class="footer-credit">Created by Ronak & Garv</p>
   </main>
 
   <!-- Resource Details Modal -->

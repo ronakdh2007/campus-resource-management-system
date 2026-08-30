@@ -28,7 +28,16 @@
   font-size: 1em;
 }
 
+.search-input:focus {
+  outline: none;
+  border-color: white;
+}
+
 .filter-button {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  font-size: 1em;
   background-color: rgb(20, 20, 20);
   border: 1px solid rgb(44, 44, 44);
   border-radius: 0.5em;
@@ -41,6 +50,105 @@
 
 .filter-button:hover {
   background-color: rgb(44, 44, 44);
+}
+
+.filter-button.active {
+  background-color: rgb(44, 44, 44);
+}
+
+.filter-container {
+  position: relative;
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5em;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(60, 60, 60);
+  border-radius: 0.5em;
+  padding: 0.75em;
+  width: 14em;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+}
+
+.filter-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.filter-type-row {
+  position: relative;
+}
+
+.filter-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  color: white;
+  font-size: 0.9em;
+  padding: 0.4em 0;
+  cursor: pointer;
+}
+
+.filter-checkbox-row input[type="checkbox"] {
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  border: 1px solid rgb(100, 100, 100);
+  border-radius: 0.25em;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  position: relative;
+}
+
+.filter-checkbox-row input[type="checkbox"]:checked {
+  background-color: rgb(0, 120, 212);
+  border-color: rgb(0, 120, 212);
+}
+
+.filter-checkbox-row input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.3em;
+  top: 0.05em;
+  width: 0.3em;
+  height: 0.55em;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.filter-subdropdown {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 0.5em;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(60, 60, 60);
+  border-radius: 0.5em;
+  padding: 0.75em;
+  width: 12em;
+  display: none;
+}
+
+.filter-subdropdown.open {
+  display: block;
+}
+
+.capacity-input {
+  width: 100%;
+  background-color: rgb(30, 30, 30);
+  border: 1px solid rgb(60, 60, 60);
+  border-radius: 0.4em;
+  color: white;
+  padding: 0.4em;
+  margin-bottom: 0.5em;
+  font-family: 'Inter Tight', sans-serif;
 }
 
 .results-count {

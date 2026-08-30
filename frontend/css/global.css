@@ -49,6 +49,7 @@ p{
   position: sticky;
   top: 0px;
   border-bottom: 1px solid rgb(44, 44, 44);
+  z-index: 100;
 }
 
 .header-bar:hover{
@@ -110,7 +111,7 @@ p{
   display: flex;
   flex-direction: column;
   gap: 0.25em;
-  background-color: black;
+  background-color: rgb(20, 20, 20);
   border: 0.5px solid rgb(60, 60, 60);
   border-radius: 6px;
   padding: 0.25em;
@@ -130,7 +131,7 @@ p{
 
 .profile-link,
 .signout-button{
-  background-color: black;
+  background-color: rgb(20, 20, 20);
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
@@ -144,7 +145,7 @@ p{
 
 .profile-link:hover,
 .signout-button:hover{
-  background-color: rgb(44, 44, 44);
+  background-color: rgb(45, 45, 45);
 }
 
 .profile-link:active,
@@ -174,6 +175,7 @@ p{
 }
 
 .sidebar{
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -184,8 +186,10 @@ p{
   background-color: black;
   border-right: 1px solid rgb(44, 44, 44);
   padding: 1.5em 0.75em;
-  width: 140px;
+  width: 164px;
   transition: width 0.25s ease;
+  justify-content: space-between;
+  z-index: 101;
 }
 
 .sidebar-links{
@@ -242,4 +246,24 @@ p{
 
 .hidden{
   display: none;
+}
+
+.sidebar li.active-sidebar-link .sidebar-links {
+  background-color: rgb(28, 28, 28);
+}
+
+.sidebar-credit {
+  font-size: 0.8em;
+  color: rgb(148, 148, 148);
+  padding: 0 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-credit {
+  opacity: 0;
 }
