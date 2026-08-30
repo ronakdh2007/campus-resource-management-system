@@ -11,6 +11,23 @@ body{
   background-color: black;
 }
 
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgb(70, 70, 70);
+  border-radius: 3px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(100, 100, 100);
+}
+
 p{
   color: white;
   font-family: 'Inter Tight', sans-serif;
@@ -140,6 +157,12 @@ p{
   font-weight: 600;
 }
 
+.page-content {
+  margin-left: 200px;   /* match sidebar's expanded width */
+  transition: margin-left 0.25s ease;
+  padding: 2em 3em;
+}
+
 .sidebar ul{
   list-style: none;
   margin: 0;
@@ -206,6 +229,10 @@ p{
 
 .sidebar.collapsed{
   width: 60px;
+}
+
+.page-content.sidebar-collapsed {
+  margin-left: 72px;   /* match sidebar's collapsed width */
 }
 
 .sidebar.collapsed .sidebar-links span{
