@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResManager Bookings</title>
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/bookings.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+  
+  <!-- Header Bar Component -->
+  <header class="header-bar">
+    
+    <div class="header-box-1">
+      <h1 class="resmanager-heading">ResManager</h1>
+      <button class="sidebar-toggle" title="Collapse Sidebar">
+        <svg class="sidebar-collapse" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg>
+        <svg class="sidebar-expand hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg>
+      </button>
+    </div>
+    
+    <div class="header-box-2">
+      <p class="username">username</p>
+      <div class="profile-container">
+        
+        <button class="profile-button" title="View Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-user-round-icon lucide-circle-user-round"><path d="M17.925 20.056a6 6 0 0 0-11.851.001"/><circle cx="12" cy="11" r="4"/><circle cx="12" cy="12" r="10"/></svg>        </button>
+        
+        <div class="profile-dropdown">
+          <a href="profile.html" class="profile-link">Profile</a>
+          <button class="signout-button">Sign Out</button>
+        </div>
+        
+      </div>
+    </div>
+    
+  </header>
+  
+  <!-- Sidebar Component -->
+  <nav class="sidebar">
+    <ul>
+      <li>
+        <a href="dashboard.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard-icon lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="resources.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2-icon lucide-building-2"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          <span>Resources</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="bookings.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></svg>
+          <span>Bookings</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="complaints.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert-icon lucide-circle-alert"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+          <span>Complaints</span>
+        </a>
+      </li>
+    </ul>
+    <p class="sidebar-credit">Created by Ronak & Garv</p>
+  </nav>
+  
+  <!-- Main Page Content -->
+  <main class="page-content">
+    <h1 class="page-heading">Bookings</h1>
+    <p class="page-tagline">Browse your current & previous bookings</p>
+
+    <a href="resources.html" class="next-booking-prompt">
+      <h2>Make your next booking, or browse available rooms suited to your requirements</h2>
+    </a>
+
+    <div class="dashboard-section">
+      <h2>Current Bookings</h2>
+      <div class="resource-grid" id="current-bookings-grid"></div>
+    </div>
+
+    <div class="dashboard-section">
+      <h2>Booking History</h2>
+      <div class="resource-grid" id="booking-history-grid"></div>
+    </div>
+  </main>
+
+  <!-- Current Booking Details / Edit Modal -->
+  <div class="modal-overlay" id="current-modal-overlay">
+    <div class="modal">
+      <button class="modal-close" id="current-modal-close">&times;</button>
+      <h2 id="current-modal-code"></h2>
+      <div class="modal-detail-row"><span class="detail-label">Room Type:</span> <span id="current-modal-type"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Building:</span> <span id="current-modal-building"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Capacity:</span> <span id="current-modal-capacity"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Booking Status:</span> <span id="current-modal-status"></span></div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Time Slot:</span>
+        <div class="slot-dropdown-container" id="edit-slot-container">
+          <button class="slot-dropdown-toggle" id="edit-slot-toggle">Select Time Slot(s)</button>
+          <div class="slot-dropdown" id="edit-slot-dropdown">
+            <p class="slot-dropdown-hint">Choose one or multiple time slots</p>
+            <div class="slot-options" id="edit-slot-options"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Purpose of Booking:</span>
+        <input type="text" class="purpose-input" id="edit-purpose-input">
+      </div>
+      <button class="book-button" id="save-changes-button" disabled>Save Changes</button>    </div>
+  </div>
+
+  <!-- Booking History (Read-Only) Modal -->
+  <div class="modal-overlay" id="history-modal-overlay">
+    <div class="modal">
+      <button class="modal-close" id="history-modal-close">&times;</button>
+      <h2 id="history-modal-code"></h2>
+      <div class="modal-detail-row"><span class="detail-label">Room Type:</span> <span id="history-modal-type"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Building:</span> <span id="history-modal-building"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Capacity:</span> <span id="history-modal-capacity"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Time Slot:</span> <span id="history-modal-slot"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Purpose of Booking:</span> <span id="history-modal-purpose"></span></div>
+    </div>
+  </div>
+
+  <!-- Changes Saved Confirmation Modal -->
+  <div class="modal-overlay" id="saved-modal-overlay">
+    <div class="modal">
+      <button class="modal-close" id="saved-modal-close">&times;</button>
+      <h2>Booking Request Changes Saved</h2>
+      <p>Changes made to your booking request have been saved and are pending administrator approval.</p>
+    </div>
+  </div>
+
+  <!-- Validation Modal (reused pattern) -->
+  <div class="modal-overlay" id="validation-modal-overlay">
+    <div class="modal validation-modal">
+      <button class="modal-close" id="validation-modal-close">&times;</button>
+      <p id="validation-message"></p>
+      <button class="book-button" id="validation-ok-button">OK</button>
+    </div>
+  </div>
+  
+  <!-- Common JS file (Header Bar, Sidebar interactivity, Booking Cards, Modals) -->
+  <script src="../js/common.js"></script>
+  <!-- JS file for the page interactivity -->
+  <script src="../js/bookings.js"></script>
+  
+</body>
+</html>

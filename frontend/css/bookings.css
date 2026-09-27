@@ -1,0 +1,76 @@
+.page-heading {
+  color: white;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 0.2em;
+}
+
+.page-tagline {
+  color: rgb(170, 170, 170);
+  font-size: 1.1em;
+  margin-bottom: 1.5em;
+}
+
+.next-booking-prompt {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.75em;
+  padding: 1.5em 2em;
+  margin-bottom: 2.5em;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.next-booking-prompt:hover {
+  transform: translateY(-0.2em);
+  box-shadow: 0 0 1.5em rgba(0, 160, 255, 0.25);
+  border-color: white;
+}
+
+.next-booking-prompt h2 {
+  color: white;
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-section h2 {
+  color: white;
+  font-size: 1.4em;
+  margin-bottom: 0.75em;
+}
+
+.dashboard-section {
+  margin-bottom: 2.5em;
+}
+
+.purpose-input {
+  width: 100%;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.4em;
+  color: white;
+  padding: 0.5em;
+  margin-top: 0.4em;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.purpose-input:focus {
+  outline: none;
+  border-color: white;
+}
+
+.status-tag {
+  display: inline-block;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0.2em 0.6em;
+  border-radius: 0.4em;
+  margin: 0.5em 0;
+}
+
+.status-approved { background-color: rgba(0, 200, 100, 0.2); color: rgb(0, 220, 120); }
+.status-rejected { background-color: rgba(220, 50, 50, 0.2); color: rgb(240, 80, 80); }
+.status-pending { background-color: rgba(230, 160, 0, 0.2); color: rgb(250, 180, 40); }

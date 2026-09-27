@@ -410,3 +410,19 @@
 .slot-options::-webkit-scrollbar-thumb:hover {
   background-color: rgb(100, 100, 100);
 }
+
+.purpose-input {
+  width: 100%;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.4em;
+  color: white;
+  padding: 0.5em;
+  margin-top: 0.4em;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.purpose-input:focus {
+  outline: none;
+  border-color: white;
+}

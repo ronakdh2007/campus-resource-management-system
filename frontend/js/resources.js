@@ -54,6 +54,8 @@ function setupResourceModal() {
       });
       document.querySelector('#slot-dropdown-toggle').textContent = 'Select Time Slot(s)';
       document.querySelector('#slot-dropdown').classList.remove('open');
+      
+      document.querySelector('#purpose-input').value = '';
 
       detailsOverlay.classList.add('open');
     }
@@ -71,9 +73,10 @@ function setupResourceModal() {
 
   document.querySelector('#book-button').addEventListener('click', function () {
     const selectedSlots = document.querySelectorAll('.slot-option.selected');
+    const purpose = document.querySelector('#purpose-input').value.trim();
 
-    if (selectedSlots.length === 0) {
-      document.querySelector('#validation-message').textContent = 'Please select at least one time slot before booking.';
+    if (selectedSlots.length === 0 || purpose === '') {
+      document.querySelector('#validation-message').textContent = 'Please select a time slot and enter a purpose before booking.';
       document.querySelector('#validation-modal-overlay').classList.add('open');
       return;
     }
