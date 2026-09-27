@@ -1,15 +1,16 @@
 // Temporary hardcoded data
 const currentBookings = [
-  { resource_code: "LHC002", resource_type: "Lecture Hall", building: "LHC Complex", capacity: 200, status: "Pending", slots: ["1:00 PM - 2:00 PM"], purpose: "Guest lecture" },
-  { resource_code: "1AB102", resource_type: "Computer Lab", building: "AB1", capacity: 60, status: "Approved", slots: ["3:00 PM - 4:00 PM", "4:00 PM - 5:00 PM"], purpose: "Coding workshop" }
+  { resource_code: "LHC002", resource_type: "Lecture Hall", building: "LHC Complex", capacity: 200, status: "Pending", booking_date: "2026-09-27", slots: ["1:00 PM - 2:00 PM"], purpose: "Guest lecture" },
+  { resource_code: "1AB102", resource_type: "Computer Lab", building: "AB1", capacity: 60, status: "Approved", booking_date: "2026-11-08", slots: ["3:00 PM - 4:00 PM", "4:00 PM - 5:00 PM"], purpose: "Coding workshop" }
 ];
 
 const bookingHistory = [
-  { resource_code: "2AB016", resource_type: "Classroom", building: "AB2", capacity: 80, slots: ["10:00 AM - 11:00 AM"], purpose: "Club meeting" }
+  { resource_code: "2AB016", resource_type: "Classroom", building: "AB2", capacity: 80, booking_date: "2026-12-25", slots: ["10:00 AM - 11:00 AM"], purpose: "Club meeting" }
 ];
 
 let originalSlots = [];
 let originalPurpose = '';
+let originalDate = '';
 
 function generateTimeSlots() {
   const slots = [];
@@ -102,16 +103,16 @@ function setupCurrentBookingModal() {
       document.querySelector('#current-modal-capacity').textContent = activeBooking.capacity;
       document.querySelector('#current-modal-status').textContent = activeBooking.status;
       document.querySelector('#edit-purpose-input').value = activeBooking.purpose;
+      document.querySelector('#edit-date-input').value = activeBooking.booking_date;
 
       document.querySelectorAll('#edit-slot-options .slot-option').forEach(function (btn) {
         const slot = btn.getAttribute('data-slot');
         btn.classList.toggle('selected', activeBooking.slots.includes(slot));
       });
       
-      document.querySelector('#edit-purpose-input').addEventListener('input', checkForChanges);
-      
       originalSlots = activeBooking.slots.slice();
       originalPurpose = activeBooking.purpose;
+      originalDate = activeBooking.booking_date;
 
       updateEditToggleLabel();
       checkForChanges();
@@ -119,6 +120,9 @@ function setupCurrentBookingModal() {
       overlay.classList.add('open');
     }
   });
+  
+  document.querySelector('#edit-purpose-input').addEventListener('input', checkForChanges);
+  document.querySelector('#edit-date-input').addEventListener('change', checkForChanges);
 
   document.querySelector('#current-modal-close').addEventListener('click', function () {
     overlay.classList.remove('open');
@@ -131,8 +135,9 @@ function setupCurrentBookingModal() {
   document.querySelector('#save-changes-button').addEventListener('click', function () {
     const selected = document.querySelectorAll('#edit-slot-options .slot-option.selected');
     const purpose = document.querySelector('#edit-purpose-input').value.trim();
+    const date = document.querySelector('#edit-date-input').value;
 
-    if (selected.length === 0 || purpose === '') {
+    if (selected.length === 0 || purpose === '' || date === '') {
       document.querySelector('#validation-message').textContent = 'Please select a time slot and enter a purpose.';
       document.querySelector('#validation-modal-overlay').classList.add('open');
       return;
@@ -140,6 +145,7 @@ function setupCurrentBookingModal() {
 
     activeBooking.slots = Array.from(selected).map(function (btn) { return btn.getAttribute('data-slot'); });
     activeBooking.purpose = purpose;
+    activeBooking.booking_date = date;
     activeBooking.status = 'Pending';
 
     renderAllBookings();
@@ -175,6 +181,7 @@ function setupHistoryModal() {
       document.querySelector('#history-modal-type').textContent = booking.resource_type;
       document.querySelector('#history-modal-building').textContent = booking.building;
       document.querySelector('#history-modal-capacity').textContent = booking.capacity;
+      document.querySelector('#history-modal-date').textContent = booking.booking_date;
       document.querySelector('#history-modal-slot').textContent = booking.slots.join(', ');
       document.querySelector('#history-modal-purpose').textContent = booking.purpose;
 
@@ -195,12 +202,14 @@ function checkForChanges() {
     .map(function (btn) { return btn.getAttribute('data-slot'); })
     .sort();
   const currentPurpose = document.querySelector('#edit-purpose-input').value.trim();
+  const currentDate = document.querySelector('#edit-date-input').value;
   const sortedOriginal = originalSlots.slice().sort();
 
   const slotsChanged = JSON.stringify(selected) !== JSON.stringify(sortedOriginal);
   const purposeChanged = currentPurpose !== originalPurpose;
+  const dateChanged = currentDate !== originalDate;
 
-  document.querySelector('#save-changes-button').disabled = !(slotsChanged || purposeChanged);
+  document.querySelector('#save-changes-button').disabled = !(slotsChanged || purposeChanged || dateChanged);
 }
 
 renderAllBookings();

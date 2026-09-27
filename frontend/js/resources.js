@@ -56,6 +56,8 @@ function setupResourceModal() {
       document.querySelector('#slot-dropdown').classList.remove('open');
       
       document.querySelector('#purpose-input').value = '';
+      
+      document.querySelector('#date-input').value = '';
 
       detailsOverlay.classList.add('open');
     }
@@ -74,9 +76,10 @@ function setupResourceModal() {
   document.querySelector('#book-button').addEventListener('click', function () {
     const selectedSlots = document.querySelectorAll('.slot-option.selected');
     const purpose = document.querySelector('#purpose-input').value.trim();
+    const date = document.querySelector('#date-input').value;
 
-    if (selectedSlots.length === 0 || purpose === '') {
-      document.querySelector('#validation-message').textContent = 'Please select a time slot and enter a purpose before booking.';
+    if (selectedSlots.length === 0 || purpose === '' || date === '') {
+      document.querySelector('#validation-message').textContent = 'Please select a date, time slot, and enter a purpose before booking.';
       document.querySelector('#validation-modal-overlay').classList.add('open');
       return;
     }
