@@ -1,3 +1,7 @@
+// TODO: replace with real auth check from backend.
+// Faculty: always true. Student: true only if they are a club president.
+const canAccess = true;
+
 // Interactivity for the profile dropdown
 function setupProfileDropdown(){
   const profileButton=document.querySelector('.profile-button');
@@ -61,6 +65,26 @@ function setupActiveSidebarLink(){
       link.closest('li').classList.add('active-sidebar-link');
     }
   });
+}
+
+// Access gate — hide page content for users who lack permission
+function applyAccessGate() {
+  if (canAccess) return;
+
+  const pageContent = document.querySelector('.page-content');
+  const denied = document.querySelector('#access-denied-card');
+
+  // Hide every direct child of .page-content except the h1 heading
+  Array.from(pageContent.children).forEach(function (child) {
+    if (!child.matches('h1.page-heading')) {
+      child.classList.add('hidden');
+    }
+  });
+
+  // Show the access-denied card (it starts hidden via CSS)
+  if (denied) {
+    denied.classList.remove('hidden');
+  }
 }
 
 setupProfileDropdown();

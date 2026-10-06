@@ -327,3 +327,4 @@ setupResourceModal();
 setupSlotDropdown();
 setupFilters();
 setupSearch();
+applyAccessGate();

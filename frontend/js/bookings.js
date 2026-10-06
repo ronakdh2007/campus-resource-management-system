@@ -216,3 +216,4 @@ renderAllBookings();
 setupCurrentBookingModal();
 setupHistoryModal();
 setupEditSlotDropdown();
+applyAccessGate();
