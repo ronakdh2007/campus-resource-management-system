@@ -20,19 +20,19 @@ Read this fully before writing any script. If something here needs to change, ch
 
 A script can only run after every table it points to exists.
 
-| File | Creates | Needs first | Owner |
-|---|---|---|---|
-| 00_create_database.sql | database `resmanager` | none | Ronak |
-| 01_department.sql | department | none | Ronak |
-| 02_resource.sql | resource | none | Ronak |
-| 03_users.sql | users | department | Ronak |
-| 04_timetable.sql | timetable | department, resource | Ronak |
-| 05_club.sql | club | users | Garv |
-| 06_booking_request.sql | booking_request | users, resource, club | Garv |
-| 07_booking_slot.sql | booking_slot | booking_request | Garv |
-| 08_complaint.sql | complaint | resource, users | Garv |
-| 09_seed_data.sql | sample rows for testing (later) | all tables | both |
-| 99_reset.sql | drops all tables, order: complaint, booking_slot, booking_request, club, timetable, users, resource, department | none | Ronak |
+| File | Creates | Needs first |
+|---|---|---|
+| 00_create_database.sql | database `resmanager` | none |
+| 01_department.sql | department | none |
+| 02_resource.sql | resource | none |
+| 03_users.sql | users | department |
+| 04_timetable.sql | timetable | department, resource |
+| 05_club.sql | club | users |
+| 06_booking_request.sql | booking_request | users, resource, club |
+| 07_booking_slot.sql | booking_slot | booking_request |
+| 08_complaint.sql | complaint | resource, users |
+| 09_seed_data.sql | sample rows for testing (later) | all tables |
+| 99_reset.sql | drops all tables, order: complaint, booking_slot, booking_request, club, timetable, users, resource, department | none |
 
 Ronak pushes 00 to 03 first, since Garv's tables point at `users`. Garv pulls them, then builds 05 to 08.
 
