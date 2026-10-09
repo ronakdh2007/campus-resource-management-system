@@ -1,0 +1,297 @@
+/* Page heading & tagline (re-declared; matches complaints.css & bookings.css) */
+.page-heading {
+  color: white;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 0.2em;
+}
+
+.page-tagline {
+  color: rgb(170, 170, 170);
+  font-size: 1.1em;
+  margin-bottom: 1.5em;
+}
+
+/* Section wrapper */
+.dashboard-section {
+  margin-bottom: 2.5em;
+}
+
+.dashboard-section h2 {
+  color: white;
+  font-size: 1.4em;
+  margin-bottom: 0.75em;
+}
+
+/* Empty-section placeholder text */
+.empty-section-msg {
+  color: rgb(100, 100, 100);
+  font-size: 0.95em;
+  margin: 0;
+}
+
+/* Action button style (New Club, Add Resource; matching complaints.css) */
+.report-issue-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 1em;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.5em;
+  padding: 0.6em 1.2em;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Inter Tight', sans-serif;
+  transition: background-color 0.2s;
+  margin-bottom: 2em;
+}
+
+.report-issue-button:hover {
+  background-color: rgb(44, 44, 44);
+}
+
+.report-issue-button:active {
+  background-color: rgb(65, 65, 65);
+}
+
+/* Tab Bar */
+.admin-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  border-bottom: 1px solid rgb(44, 44, 44);
+  margin-bottom: 2em;
+  padding-bottom: 0;
+}
+
+.admin-tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: rgb(160, 160, 160);
+  font-family: Inter, sans-serif;
+  font-size: 1.05em;
+  font-weight: 600;
+  padding: 0.75em 1em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.admin-tab:hover {
+  color: white;
+}
+
+.admin-tab.active {
+  color: white;
+  border-bottom-color: rgb(0, 120, 212);
+}
+
+.tab-badge {
+  background-color: rgb(0, 120, 212);
+  color: white;
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 0.15em 0.55em;
+  border-radius: 10px;
+  line-height: 1.2;
+}
+
+/* Form inputs & selects (box-sizing scoped to new inputs) */
+.admin-input,
+.admin-select {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.4em;
+  color: white;
+  padding: 0.5em;
+  margin-top: 0.4em;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1em;
+  color-scheme: dark;
+}
+
+.admin-select {
+  background-color: rgb(30, 30, 30);
+  border-color: rgb(60, 60, 60);
+  cursor: pointer;
+}
+
+.admin-input:focus,
+.admin-select:focus {
+  outline: none;
+  border-color: white;
+}
+
+.detail-muted {
+  font-size: 0.85em;
+  color: rgb(150, 150, 150);
+  font-weight: normal;
+}
+
+.retire-note {
+  margin: 1em 0 0.5em 0;
+  font-style: italic;
+}
+
+/* Modal action buttons */
+.admin-modal {
+  max-width: 32em;
+}
+
+.modal-action-row {
+  display: flex;
+  gap: 1em;
+  margin-top: 1.5em;
+}
+
+.modal-action-row .book-button {
+  margin-top: 0;
+  flex: 1;
+}
+
+.admin-approve-btn {
+  background-color: rgb(0, 120, 212);
+}
+
+.admin-reject-btn {
+  background-color: rgba(220, 50, 50, 0.15);
+  border: 1px solid rgb(240, 80, 80);
+  color: rgb(240, 80, 80);
+}
+
+.admin-reject-btn:hover:not(:disabled) {
+  background-color: rgba(220, 50, 50, 0.35);
+}
+
+/* CSV Upload Area */
+.csv-upload-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1em;
+  background-color: rgb(20, 20, 20);
+  border: 1px dashed rgb(60, 60, 60);
+  border-radius: 0.75em;
+  padding: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.csv-file-input {
+  display: none;
+}
+
+.csv-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background-color: rgb(30, 30, 30);
+  border: 1px solid rgb(60, 60, 60);
+  border-radius: 0.5em;
+  color: white;
+  padding: 0.6em 1.2em;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.csv-label:hover {
+  background-color: rgb(45, 45, 45);
+  border-color: white;
+}
+
+.csv-filename {
+  color: rgb(170, 170, 170);
+  font-size: 0.9em;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.csv-sample-link {
+  margin-left: auto;
+  color: rgb(0, 160, 255);
+  text-decoration: underline;
+  font-size: 0.9em;
+  font-family: 'Inter Tight', sans-serif;
+  cursor: pointer;
+}
+
+.csv-sample-link:hover {
+  color: white;
+}
+
+.csv-preview-heading {
+  color: white;
+  font-size: 1.1em;
+  margin: 1em 0 0.5em 0;
+}
+
+.csv-invalid-list {
+  background-color: rgba(220, 50, 50, 0.1);
+  border: 1px solid rgba(220, 50, 50, 0.35);
+  border-radius: 0.5em;
+  padding: 1em;
+  margin: 1em 0;
+}
+
+.csv-invalid-item {
+  color: rgb(240, 100, 100);
+  font-size: 0.9em;
+  margin: 0.3em 0;
+  font-family: 'Inter Tight', sans-serif;
+}
+
+/* Timetable Table Styles */
+.timetable-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.75em;
+  margin-top: 0.5em;
+  background-color: rgb(20, 20, 20);
+}
+
+.timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.95em;
+}
+
+.timetable-table th,
+.timetable-table td {
+  padding: 0.85em 1.2em;
+  border-bottom: 1px solid rgb(35, 35, 35);
+  color: white;
+}
+
+.timetable-table th {
+  background-color: rgb(28, 28, 28);
+  color: rgb(180, 180, 180);
+  font-weight: 600;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.timetable-table tbody tr:hover {
+  background-color: rgb(28, 28, 28);
+}
+
+.timetable-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.timetable-count {
+  font-size: 0.75em;
+  color: rgb(150, 150, 150);
+  font-weight: normal;
+  margin-left: 0.4em;
+}

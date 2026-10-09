@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResManager Admin</title>
+  <meta name="description" content="Admin panel for ResManager — manage bookings, complaints, clubs, resources and the timetable.">
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header Bar Component -->
+  <header class="header-bar">
+
+    <div class="header-box-1">
+      <h1 class="resmanager-heading">ResManager</h1>
+      <button class="sidebar-toggle" title="Collapse Sidebar">
+        <svg class="sidebar-collapse" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg>
+        <svg class="sidebar-expand hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg>
+      </button>
+    </div>
+
+    <div class="header-box-2">
+      <p class="username">username</p>
+      <div class="profile-container">
+
+        <button class="profile-button" title="View Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-user-round-icon lucide-circle-user-round"><path d="M17.925 20.056a6 6 0 0 0-11.851.001"/><circle cx="12" cy="11" r="4"/><circle cx="12" cy="12" r="10"/></svg>        </button>
+
+        <div class="profile-dropdown">
+          <a href="profile.html" class="profile-link">Profile</a>
+          <button class="signout-button">Sign Out</button>
+        </div>
+
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Sidebar Component -->
+  <nav class="sidebar">
+    <ul>
+      <li>
+        <a href="dashboard.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard-icon lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="resources.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2-icon lucide-building-2"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          <span>Resources</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="bookings.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></svg>
+          <span>Bookings</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="complaints.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert-icon lucide-circle-alert"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+          <span>Complaints</span>
+        </a>
+      </li>
+    </ul>
+    <p class="sidebar-credit">Created by Ronak &amp; Garv</p>
+  </nav>
+
+  <!-- Main Page Content -->
+  <main class="page-content">
+    <h1 class="page-heading">Admin</h1>
+    <p class="page-tagline">Manage bookings, complaints, clubs, resources and the timetable</p>
+
+    <!-- Access denied card (shown when isAdmin is false) -->
+    <div class="access-denied-card hidden" id="access-denied-card">
+      <p>This page is only available to administrators.</p>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="admin-tab-bar" id="admin-tab-bar">
+      <button class="admin-tab active" data-tab="bookings" id="tab-bookings">
+        Bookings
+        <span class="tab-badge hidden" id="badge-bookings">0</span>
+      </button>
+      <button class="admin-tab" data-tab="complaints" id="tab-complaints">
+        Complaints
+        <span class="tab-badge hidden" id="badge-complaints">0</span>
+      </button>
+      <button class="admin-tab" data-tab="clubs" id="tab-clubs">Clubs</button>
+      <button class="admin-tab" data-tab="resources" id="tab-resources">Resources</button>
+      <button class="admin-tab" data-tab="timetable" id="tab-timetable">Timetable</button>
+    </div>
+
+    <!-- TAB 1: BOOKINGS -->
+    <div class="tab-section" id="section-bookings">
+      <div class="dashboard-section">
+        <h2>Pending Requests</h2>
+        <div class="resource-grid" id="admin-pending-bookings-grid"></div>
+      </div>
+      <div class="dashboard-section">
+        <h2>Processed Bookings</h2>
+        <div class="resource-grid" id="admin-processed-bookings-grid"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: COMPLAINTS -->
+    <div class="tab-section hidden" id="section-complaints">
+      <div class="dashboard-section">
+        <h2>Pending Complaints</h2>
+        <div class="resource-grid" id="admin-pending-complaints-grid"></div>
+      </div>
+      <div class="dashboard-section">
+        <h2>Resolved Complaints</h2>
+        <div class="resource-grid" id="admin-resolved-complaints-grid"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CLUBS -->
+    <div class="tab-section hidden" id="section-clubs">
+      <button class="report-issue-button" id="new-club-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        New Club
+      </button>
+      <div class="resource-grid" id="clubs-grid"></div>
+    </div>
+
+    <!-- TAB 4: RESOURCES -->
+    <div class="tab-section hidden" id="section-resources">
+      <button class="report-issue-button" id="add-resource-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        Add Resource
+      </button>
+      <div class="resource-grid" id="admin-resources-grid"></div>
+    </div>
+
+    <!-- TAB 5: TIMETABLE -->
+    <div class="tab-section hidden" id="section-timetable">
+      <div class="dashboard-section">
+        <h2>Upload CSV</h2>
+        <div class="csv-upload-area">
+          <label class="csv-label" for="csv-file-input">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="m9 15 3-3 3 3"/></svg>
+            Choose CSV File
+          </label>
+          <input type="file" id="csv-file-input" accept=".csv" class="csv-file-input">
+          <span id="csv-filename" class="csv-filename">No file chosen</span>
+          <a class="csv-sample-link" id="csv-sample-link" href="#">Download sample CSV</a>
+        </div>
+
+        <div id="csv-preview-area" class="hidden">
+          <h3 class="csv-preview-heading">Valid rows (<span id="valid-count">0</span>)</h3>
+          <div class="timetable-table-wrapper">
+            <table class="timetable-table" id="csv-valid-table">
+              <thead>
+                <tr>
+                  <th>Day</th><th>Time</th><th>Subject</th><th>Department</th><th>Resource</th>
+                </tr>
+              </thead>
+              <tbody id="csv-valid-tbody"></tbody>
+            </table>
+          </div>
+          <div id="csv-invalid-list" class="csv-invalid-list hidden"></div>
+          <button class="book-button" id="confirm-upload-btn" disabled>Confirm Upload</button>
+        </div>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>Current Timetable <span class="timetable-count" id="timetable-count"></span></h2>
+        <div class="timetable-table-wrapper">
+          <table class="timetable-table" id="current-timetable-table">
+            <thead>
+              <tr>
+                <th>Day</th><th>Time</th><th>Subject</th><th>Department</th><th>Resource</th>
+              </tr>
+            </thead>
+            <tbody id="timetable-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- PENDING BOOKING MODAL -->
+  <div class="modal-overlay" id="pending-booking-overlay">
+    <div class="modal admin-modal">
+      <button class="modal-close" id="pending-booking-close">&times;</button>
+      <h2 id="pb-modal-code"></h2>
+      <div class="modal-detail-row"><span class="detail-label">Type:</span> <span id="pb-modal-type"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Building:</span> <span id="pb-modal-building"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Capacity:</span> <span id="pb-modal-capacity"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Resource Status:</span> <span id="pb-modal-res-status"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Booking Date:</span> <span id="pb-modal-date"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Time Slots:</span> <span id="pb-modal-slots"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Purpose:</span> <span id="pb-modal-purpose"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Requested by:</span> <span id="pb-modal-user"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Club:</span> <span id="pb-modal-club"></span></div>
+      <div class="modal-action-row">
+        <button class="book-button admin-approve-btn" id="pb-approve-btn">Approve</button>
+        <button class="book-button admin-reject-btn" id="pb-reject-btn">Reject</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCESSED BOOKING MODAL -->
+  <div class="modal-overlay" id="processed-booking-overlay">
+    <div class="modal admin-modal">
+      <button class="modal-close" id="processed-booking-close">&times;</button>
+      <h2 id="prb-modal-code"></h2>
+      <div class="modal-detail-row"><span class="detail-label">Type:</span> <span id="prb-modal-type"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Building:</span> <span id="prb-modal-building"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Capacity:</span> <span id="prb-modal-capacity"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Booking Date:</span> <span id="prb-modal-date"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Time Slots:</span> <span id="prb-modal-slots"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Purpose:</span> <span id="prb-modal-purpose"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Requested by:</span> <span id="prb-modal-user"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Club:</span> <span id="prb-modal-club"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Status:</span> <span id="prb-modal-status"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Processed by:</span> <span id="prb-modal-processed-by"></span></div>
+    </div>
+  </div>
+
+  <!-- PENDING COMPLAINT MODAL (admin) -->
+  <div class="modal-overlay" id="admin-pending-complaint-overlay">
+    <div class="modal admin-modal">
+      <button class="modal-close" id="admin-pending-complaint-close">&times;</button>
+      <h2 id="apc-modal-title"></h2>
+      <div class="modal-detail-row"><span class="detail-label">Resource:</span> <span id="apc-modal-code"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Type:</span> <span id="apc-modal-type"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Building:</span> <span id="apc-modal-building"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Description:</span> <span id="apc-modal-desc"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Filed on:</span> <span id="apc-modal-filed"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Filed by:</span> <span id="apc-modal-user"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Status:</span> <span id="apc-modal-status"></span></div>
+      <button class="book-button" id="apc-resolve-btn">Mark as Resolved</button>
+    </div>
+  </div>
+
+  <!-- RESOLVED COMPLAINT MODAL (admin) -->
+  <div class="modal-overlay" id="admin-resolved-complaint-overlay">
+    <div class="modal admin-modal">
+      <button class="modal-close" id="admin-resolved-complaint-close">&times;</button>
+      <h2 id="arc-modal-title"></h2>
+      <div class="modal-detail-row"><span class="detail-label">Resource:</span> <span id="arc-modal-code"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Type:</span> <span id="arc-modal-type"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Building:</span> <span id="arc-modal-building"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Description:</span> <span id="arc-modal-desc"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Filed on:</span> <span id="arc-modal-filed"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Filed by:</span> <span id="arc-modal-user"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Status:</span> <span id="arc-modal-status"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Resolved by:</span> <span id="arc-modal-resolved-by"></span></div>
+      <div class="modal-detail-row"><span class="detail-label">Resolved on:</span> <span id="arc-modal-resolved-date"></span></div>
+    </div>
+  </div>
+
+  <!-- NEW CLUB MODAL -->
+  <div class="modal-overlay" id="new-club-overlay">
+    <div class="modal">
+      <button class="modal-close" id="new-club-close">&times;</button>
+      <h2>New Club</h2>
+      <div class="modal-detail-row">
+        <span class="detail-label">Club Name</span>
+        <input type="text" class="admin-input" id="new-club-name" maxlength="100" placeholder="Enter club name">
+      </div>
+      <button class="book-button" id="new-club-submit-btn">Create Club</button>
+    </div>
+  </div>
+
+  <!-- MANAGE CLUB MODAL -->
+  <div class="modal-overlay" id="manage-club-overlay">
+    <div class="modal">
+      <button class="modal-close" id="manage-club-close">&times;</button>
+      <h2 id="manage-club-name-heading"></h2>
+      <div class="modal-detail-row">
+        <span class="detail-label">President</span>
+        <select class="admin-select" id="manage-president-select"></select>
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Faculty Advisor</span>
+        <select class="admin-select" id="manage-advisor-select"></select>
+      </div>
+      <button class="book-button" id="manage-club-save-btn" disabled>Save Changes</button>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT RESOURCE MODAL -->
+  <div class="modal-overlay" id="resource-edit-overlay">
+    <div class="modal admin-modal">
+      <button class="modal-close" id="resource-edit-close">&times;</button>
+      <h2 id="resource-edit-heading">Add Resource</h2>
+      <div class="modal-detail-row">
+        <span class="detail-label">Resource Code <span class="detail-muted">(max 10, e.g. LHC003)</span></span>
+        <input type="text" class="admin-input" id="re-code" maxlength="10" placeholder="e.g. LHC003">
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Room Number <span class="detail-muted">(max 10)</span></span>
+        <input type="text" class="admin-input" id="re-room" maxlength="10" placeholder="e.g. 003">
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Resource Type</span>
+        <input type="text" class="admin-input" id="re-type" list="type-datalist" placeholder="e.g. Lecture Hall">
+        <datalist id="type-datalist"></datalist>
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Building</span>
+        <input type="text" class="admin-input" id="re-building" placeholder="e.g. LHC Complex">
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Capacity <span class="detail-muted">(integer &gt; 0)</span></span>
+        <input type="number" class="admin-input" id="re-capacity" min="1" placeholder="e.g. 200">
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Floor <span class="detail-muted">(0 = ground)</span></span>
+        <input type="number" class="admin-input" id="re-floor" placeholder="e.g. 0">
+      </div>
+      <div class="modal-detail-row">
+        <span class="detail-label">Status</span>
+        <select class="admin-select" id="re-status">
+          <option value="Available">Available</option>
+          <option value="Unavailable">Unavailable</option>
+          <option value="Maintenance">Maintenance</option>
+        </select>
+      </div>
+      <p class="detail-muted retire-note">To retire a resource, set its status to Unavailable.</p>
+      <button class="book-button" id="resource-edit-save-btn">Save Resource</button>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="confirm-modal-overlay">
+    <div class="modal">
+      <button class="modal-close" id="confirm-modal-close">&times;</button>
+      <h2 id="confirm-modal-heading"></h2>
+      <p id="confirm-modal-message"></p>
+    </div>
+  </div>
+
+  <!-- VALIDATION MODAL -->
+  <div class="modal-overlay" id="validation-modal-overlay">
+    <div class="modal validation-modal">
+      <button class="modal-close" id="validation-modal-close">&times;</button>
+      <p id="validation-message"></p>
+      <button class="book-button" id="validation-ok-button">OK</button>
+    </div>
+  </div>
+
+  <!-- Common JS file (Header Bar, Sidebar interactivity) -->
+  <script src="../js/common.js"></script>
+  <!-- JS file for the page interactivity -->
+  <script src="../js/admin.js"></script>
+
+</body>
+</html>

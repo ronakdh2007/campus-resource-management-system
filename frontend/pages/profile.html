@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResManager Profile</title>
+  <meta name="description" content="Manage your personal profile, department, contact information and account settings in ResManager.">
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/profile.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900&family=Roboto:ital,wght@0,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header Bar Component -->
+  <header class="header-bar">
+
+    <div class="header-box-1">
+      <h1 class="resmanager-heading">ResManager</h1>
+      <button class="sidebar-toggle" title="Collapse Sidebar">
+        <svg class="sidebar-collapse" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg>
+        <svg class="sidebar-expand hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg>
+      </button>
+    </div>
+
+    <div class="header-box-2">
+      <p class="username" id="header-username">username</p>
+      <div class="profile-container">
+
+        <button class="profile-button active" title="View Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-user-round-icon lucide-circle-user-round"><path d="M17.925 20.056a6 6 0 0 0-11.851.001"/><circle cx="12" cy="11" r="4"/><circle cx="12" cy="12" r="10"/></svg>        </button>
+
+        <div class="profile-dropdown">
+          <a href="profile.html" class="profile-link">Profile</a>
+          <button class="signout-button">Sign Out</button>
+        </div>
+
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Sidebar Component -->
+  <nav class="sidebar">
+    <ul>
+      <li>
+        <a href="dashboard.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard-icon lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="resources.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2-icon lucide-building-2"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          <span>Resources</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="bookings.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></svg>
+          <span>Bookings</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="complaints.html" class="sidebar-links">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert-icon lucide-circle-alert"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+          <span>Complaints</span>
+        </a>
+      </li>
+    </ul>
+    <p class="sidebar-credit">Created by Ronak &amp; Garv</p>
+  </nav>
+
+  <!-- Main Page Content -->
+  <main class="page-content">
+    <h1 class="page-heading">Profile</h1>
+    <p class="page-tagline">Manage your personal information and account settings</p>
+
+    <div class="profile-wrapper">
+
+      <!-- Profile Overview Banner -->
+      <div class="profile-header-card">
+        <div class="profile-avatar-wrapper">
+          <div class="profile-avatar" id="profile-avatar">AS</div>
+        </div>
+        <div class="profile-header-info">
+          <div class="profile-name-row">
+            <h2 id="overview-name">Aarav Sharma</h2>
+            <span class="status-tag status-available" id="overview-role">Student</span>
+          </div>
+          <p class="profile-email" id="overview-email">aarav.2410101001@muj.manipal.edu</p>
+          <p class="profile-meta">
+            <span id="overview-dept">Computer Science &amp; Engineering</span>
+            <span class="meta-dot">&middot;</span>
+            <span id="overview-club">Coding Club (President)</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Edit Profile Card -->
+      <div class="profile-card">
+        <h2>Personal Information</h2>
+        <p class="card-subtitle">Update your personal and departmental details</p>
+
+        <div class="form-group">
+          <label class="form-label" for="profile-name-input">Full Name</label>
+          <input type="text" class="profile-input" id="profile-name-input" maxlength="100" placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profile-email-input">Email Address</label>
+          <input type="email" class="profile-input" id="profile-email-input" disabled>
+          <span class="input-hint">Synced with your verified Microsoft single sign-on</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profile-role-input">Role</label>
+          <input type="text" class="profile-input" id="profile-role-input" disabled>
+          <span class="input-hint">Assigned automatically from institutional credentials</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profile-dept-select">Department</label>
+          <select class="profile-select" id="profile-dept-select">
+            <option value="" disabled selected>Select Department</option>
+          </select>
+          <span class="input-hint">Select the department you are affiliated with</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profile-phone-input">Phone Number</label>
+          <input type="tel" class="profile-input" id="profile-phone-input" maxlength="15" placeholder="+91 9876543210">
+          <span class="input-hint">Used for urgent notifications and resource updates</span>
+        </div>
+
+        <button class="book-button" id="save-profile-btn" disabled>Save Changes</button>
+
+        <!-- Account Information Section -->
+        <div class="account-info-box">
+          <h3>Account Information</h3>
+          <div class="account-info-grid">
+            <div class="account-info-item">
+              <span class="info-label">User ID:</span>
+              <span class="info-value" id="security-user-id">2</span>
+            </div>
+            <div class="account-info-item">
+              <span class="info-label">Account Status:</span>
+              <span class="status-tag status-available">Active</span>
+            </div>
+            <div class="account-info-item">
+              <span class="info-label">Sign-in Provider:</span>
+              <span class="info-value">Microsoft 365 SSO</span>
+            </div>
+            <div class="account-info-item">
+              <span class="info-label">Role:</span>
+              <span class="info-value" id="account-role-display">Student</span>
+            </div>
+          </div>
+          <p class="account-permissions-note">
+            <strong>Permissions:</strong> <span id="account-permissions-text">Standard access (Dashboard, Bookings, Resources, Complaints, Profile).</span>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirm-modal-overlay">
+    <div class="modal">
+      <button class="modal-close" id="confirm-modal-close">&times;</button>
+      <h2 id="confirm-modal-heading"></h2>
+      <p id="confirm-modal-message"></p>
+    </div>
+  </div>
+
+  <!-- Validation Modal -->
+  <div class="modal-overlay" id="validation-modal-overlay">
+    <div class="modal validation-modal">
+      <button class="modal-close" id="validation-modal-close">&times;</button>
+      <p id="validation-message"></p>
+      <button class="book-button" id="validation-ok-button">OK</button>
+    </div>
+  </div>
+
+  <!-- Common JS file (Header Bar, Sidebar interactivity) -->
+  <script src="../js/common.js"></script>
+  <!-- JS file for Profile interactivity -->
+  <script src="../js/profile.js"></script>
+
+</body>
+</html>

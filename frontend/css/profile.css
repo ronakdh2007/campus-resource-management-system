@@ -1,0 +1,210 @@
+/* Page heading & tagline (consistent with complaints.css, bookings.css, admin.css) */
+.page-heading {
+  color: white;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 0.2em;
+}
+
+.page-tagline {
+  color: rgb(170, 170, 170);
+  font-size: 1.1em;
+  margin-bottom: 1.5em;
+}
+
+/* Profile Content Wrapper to ensure identical card width */
+.profile-wrapper {
+  max-width: 46em;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+/* Shared card dimensions & styling */
+.profile-header-card,
+.profile-card {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.75em;
+  padding: 1.75em 2em;
+  margin: 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.profile-header-card:hover,
+.profile-card:hover {
+  transform: translateY(-0.2em);
+  box-shadow: 0 0 1.5em rgba(0, 160, 255, 0.2);
+  border-color: white;
+}
+
+.profile-header-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+}
+
+.profile-avatar-wrapper {
+  flex-shrink: 0;
+}
+
+.profile-avatar {
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgb(0, 120, 212), rgb(0, 70, 160));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 1em rgba(0, 120, 212, 0.35);
+}
+
+.profile-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  flex-wrap: wrap;
+}
+
+.profile-name-row h2 {
+  color: white;
+  font-size: 1.4em;
+  margin: 0;
+}
+
+.profile-email {
+  color: rgb(170, 170, 170);
+  font-size: 0.95em;
+  margin: 0.1em 0;
+}
+
+.profile-meta {
+  color: rgb(140, 140, 140);
+  font-size: 0.9em;
+  margin: 0.2em 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.meta-dot {
+  color: rgb(100, 100, 100);
+}
+
+.profile-card h2 {
+  color: white;
+  font-size: 1.3em;
+  margin: 0 0 0.3em 0;
+}
+
+.card-subtitle {
+  color: rgb(160, 160, 160);
+  font-size: 0.9em;
+  margin: 0 0 1.5em 0;
+}
+
+/* Form inputs & labels (box-sizing scoped to new inputs) */
+.form-group {
+  margin-bottom: 1.25em;
+}
+
+.form-label {
+  display: block;
+  color: rgb(170, 170, 170);
+  font-size: 0.9em;
+  font-weight: 600;
+  margin-bottom: 0.35em;
+}
+
+.profile-input,
+.profile-select {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: rgb(30, 30, 30);
+  border: 1px solid rgb(60, 60, 60);
+  border-radius: 0.4em;
+  color: white;
+  padding: 0.6em 0.8em;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.95em;
+  color-scheme: dark;
+  transition: border-color 0.2s;
+}
+
+.profile-input:focus,
+.profile-select:focus {
+  outline: none;
+  border-color: white;
+}
+
+.profile-input:disabled {
+  background-color: rgb(22, 22, 22);
+  border-color: rgb(40, 40, 40);
+  color: rgb(140, 140, 140);
+  cursor: not-allowed;
+}
+
+.input-hint {
+  display: block;
+  color: rgb(130, 130, 130);
+  font-size: 0.8em;
+  margin-top: 0.35em;
+}
+
+/* Account Details Box merged into card */
+.account-info-box {
+  margin-top: 2.25em;
+  padding-top: 1.75em;
+  border-top: 1px solid rgb(44, 44, 44);
+}
+
+.account-info-box h3 {
+  color: white;
+  font-size: 1.1em;
+  margin: 0 0 1em 0;
+}
+
+.account-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12em, 1fr));
+  gap: 1em;
+  margin-bottom: 1.25em;
+}
+
+.account-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.info-label {
+  color: rgb(160, 160, 160);
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.info-value {
+  color: white;
+  font-size: 0.95em;
+}
+
+.account-permissions-note {
+  font-size: 0.9em;
+  color: rgb(170, 170, 170);
+  margin: 0.5em 0 0 0;
+  line-height: 1.4;
+}
