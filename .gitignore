@@ -1,3 +1,5 @@
 .vscode/
 .DS_Store
 docs/html-css-reference.pdf
+node_modules/
+.env
