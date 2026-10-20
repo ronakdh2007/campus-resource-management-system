@@ -1,0 +1,19 @@
+-- USE resmanager;
+
+-- BEWARE:
+-- THIS SCRIPT IS TO RESET THE ENTIRE DATABASE
+-- THE BELOW COMMANDS ARE TO DELETE THE TABLES AND RETAIN ONLY THE DATABASE
+-- RUN THEM ONLY IF YOU UNDERSTAND THE CONSEQUENCES OF YOUR ACTIONS
+
+-- FK dosent let the table its being referenced from to be dropped
+-- Therefore, drop the tables that refer others then drop the other tables
+
+-- REMOVE COMMENTS AND RUN ONLY IF YOU UNDERSTAND THE CONSEQUENCES OF YOUR ACTIONS
+-- DROP TABLE IF EXISTS complaint;
+-- DROP TABLE IF EXISTS booking_slot;
+-- DROP TABLE IF EXISTS booking_request;
+-- DROP TABLE IF EXISTS club;
+-- DROP TABLE IF EXISTS timetable;
+-- DROP TABLE IF EXISTS users;
+-- DROP TABLE IF EXISTS resource;
+-- DROP TABLE IF EXISTS department;
