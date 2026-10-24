@@ -97,7 +97,7 @@ app.put('/me', attachUser, async (req, res) => {
     const deptId = Number(req.body.department_id);
 
     if (!name || name.length > 100) return res.status(400).json({ error: 'Please enter a valid name.' });
-    if (phone && (phone.length < 7 || phone.length > 20)) return res.status(400).json({ error: 'Please enter a valid phone number.' });
+    if (phone && !/^[6-9]\d{9}$/.test(phone)) return res.status(400).json({ error: 'Phone number must be exactly 10 digits and start with 6, 7, 8 or 9.' });
 
     const [d] = await pool.query('SELECT 1 FROM department WHERE department_id = ?', [deptId]);
     if (d.length === 0) return res.status(400).json({ error: 'Please select a valid department.' });

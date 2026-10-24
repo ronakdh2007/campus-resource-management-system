@@ -9,7 +9,7 @@ async function loadProfileData() {
     user_id: me.user_id,
     name: me.name,
     email: me.email,
-    phone: me.phone,
+    phone: me.phone ? me.phone.replace(/\D/g, '').slice(-10) : '',
     role: me.role,
     department_id: me.department_id,
     club_affiliation: me.club ? me.club.club_name + ' (President)' : null
@@ -133,7 +133,12 @@ function setupProfileForm() {
 
   nameInput.addEventListener('input', checkForProfileChanges);
   deptSelect.addEventListener('change', checkForProfileChanges);
-  phoneInput.addEventListener('input', checkForProfileChanges);
+  
+  // keep only digits, max 10, BEFORE checking for changes (listeners run in the order added)
+  phoneInput.addEventListener('input', function () {
+    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+    checkForProfileChanges();
+  });
 
   saveBtn.addEventListener('click', async function () {
     const name = nameInput.value.trim();
@@ -142,8 +147,8 @@ function setupProfileForm() {
 
     if (!name) { showValidation('Please enter your full name.'); return; }
     if (!deptId) { showValidation('Please select a department.'); return; }
-    if (phone && phone.length < 7) {
-      showValidation('Please enter a valid phone number (at least 7 characters).');
+    if (phone && !/^[6-9]\d{9}$/.test(phone)) {
+      showValidation('Phone number must be exactly 10 digits and start with 6, 7, 8 or 9.');
       return;
     }
 
