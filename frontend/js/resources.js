@@ -32,6 +32,14 @@ function renderResources(list) {
   grid.innerHTML = cardsHTML;
 }
 
+function to24(t) { // "9:00 AM" -> "09:00:00"
+  const [time, period] = t.split(' ');
+  let [h, m] = time.split(':').map(Number);
+  if (period === 'PM' && h !== 12) h += 12;
+  if (period === 'AM' && h === 12) h = 0;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':00';
+}
+
 // For resource modal
 function setupResourceModal() {
   const grid = document.querySelector('#resource-grid');
@@ -73,13 +81,36 @@ function setupResourceModal() {
     }
   });
 
-  document.querySelector('#book-button').addEventListener('click', function () {
+  document.querySelector('#book-button').addEventListener('click', async function () {
     const selectedSlots = document.querySelectorAll('.slot-option.selected');
     const purpose = document.querySelector('#purpose-input').value.trim();
     const date = document.querySelector('#date-input').value;
 
     if (selectedSlots.length === 0 || purpose === '' || date === '') {
       document.querySelector('#validation-message').textContent = 'Please select a date, time slot, and enter a purpose before booking.';
+      document.querySelector('#validation-modal-overlay').classList.add('open');
+      return;
+    }
+
+    const slots = Array.from(selectedSlots).map(function (btn) {
+      const [s, e] = btn.dataset.slot.split(' - ');
+      return { start_time: to24(s), end_time: to24(e) };
+    });
+
+    const response = await fetch('/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resource_code: document.querySelector('#modal-room-code').textContent,
+        booking_date: date,
+        purpose: purpose,
+        slots: slots
+      })
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      document.querySelector('#validation-message').textContent = data.error;
       document.querySelector('#validation-modal-overlay').classList.add('open');
       return;
     }
