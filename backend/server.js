@@ -1,7 +1,12 @@
 const express = require('express');
+const path = require('path');
 const pool = require('./db');
 
 const app = express();
+
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+app.get('/', (req, res) => res.redirect('/pages/login.html'));
 
 app.get('/resources', async (req, res) => {
   try {

@@ -1,10 +1,10 @@
-// Temporary hardcoded data
-const resources=[
-  { resource_code: "LHC002", room_number: "002", resource_type: "Lecture Hall", building: "LHC Complex", capacity: 200, status: "Available" },
-  { resource_code: "2AB016", room_number: "016", resource_type: "Classroom", building: "AB2", capacity: 80, status: "Unavailable" },
-  { resource_code: "1AB102", room_number: "102", resource_type: "Computer Lab", building: "AB1", capacity: 60, status: "Available" },
-  { resource_code: "LHC202", room_number: "202", resource_type: "Classroom", building: "LHC", capacity: 80, status: "Maintenance" }
-];
+let resources = [];
+
+async function loadResources() {
+  const response = await fetch('/resources');
+  if (!response.ok) throw new Error('Server error: ' + response.status);
+  resources = await response.json();
+}
 
 // For resource rendering
 function renderResources(list) {
@@ -190,34 +190,6 @@ function getCheckedValues(groupName) {
   return Array.from(checked).map(function (cb) { return cb.value; });
 }
 
-function applyFilters() {
-  let filtered = resources;
-
-  const selectedBuildings = getCheckedValues('building');
-  const selectedRoomTypes = getCheckedValues('roomType');
-  const selectedStatuses = getCheckedValues('status');
-  const minCapacity = document.querySelector('#capacity-min').value;
-  const maxCapacity = document.querySelector('#capacity-max').value;
-
-  if (selectedBuildings.length > 0) {
-    filtered = filtered.filter(function (r) { return selectedBuildings.includes(r.building); });
-  }
-  if (selectedRoomTypes.length > 0) {
-    filtered = filtered.filter(function (r) { return selectedRoomTypes.includes(r.resource_type); });
-  }
-  if (selectedStatuses.length > 0) {
-    filtered = filtered.filter(function (r) { return selectedStatuses.includes(r.status); });
-  }
-  if (minCapacity) {
-    filtered = filtered.filter(function (r) { return r.capacity >= Number(minCapacity); });
-  }
-  if (maxCapacity) {
-    filtered = filtered.filter(function (r) { return r.capacity <= Number(maxCapacity); });
-  }
-
-  renderResources(filtered);
-}
-
 function setupFilters() {
   const filterToggle = document.querySelector('#filter-toggle');
   const filterDropdown = document.querySelector('#filter-dropdown');
@@ -322,9 +294,20 @@ function applyFilters() {
   renderResources(filtered);
 }
 
-renderResources();
-setupResourceModal();
-setupSlotDropdown();
-setupFilters();
-setupSearch();
-applyAccessGate();
+async function init() {
+  try {
+    await loadResources();
+  } catch (err) {
+    console.error(err);
+    document.querySelector('#resource-grid').textContent = 'Could not load resources.';
+    return;
+  }
+  renderResources();
+  setupResourceModal();
+  setupSlotDropdown();
+  setupFilters();
+  setupSearch();
+  applyAccessGate();
+}
+
+init();
