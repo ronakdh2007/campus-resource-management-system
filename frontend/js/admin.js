@@ -1,57 +1,47 @@
-// Temporary hardcoded data matching database tables exactly
-const users = [
-  { user_id: 1, name: 'Admin', email: 'admin@muj.manipal.edu', role: 'Admin', department_id: 1 },
-  { user_id: 2, name: 'Aarav Sharma', email: 'aarav.2410101001@muj.manipal.edu', role: 'Student', department_id: 1 },
-  { user_id: 3, name: 'Diya Patel', email: 'diya.2410101002@muj.manipal.edu', role: 'Student', department_id: 2 },
-  { user_id: 4, name: 'Kabir Verma', email: 'kabir.2410101003@muj.manipal.edu', role: 'Student', department_id: 3 },
-  { user_id: 5, name: 'Dr. Ramesh Kumar', email: 'ramesh.kumar@jaipur.manipal.edu', role: 'Faculty', department_id: 1 },
-  { user_id: 6, name: 'Dr. Sunita Rao', email: 'sunita.rao@jaipur.manipal.edu', role: 'Faculty', department_id: 2 }
-];
+let users = [], departments = [], resources = [], clubs = [], bookings = [], complaints = [], timetable = [];
 
-const departments = [
-  { department_id: 1, department_code: 'CSE', department_name: 'Computer Science & Engineering' },
-  { department_id: 2, department_code: 'ECE', department_name: 'Electronics & Communication Engineering' },
-  { department_id: 3, department_code: 'MECH', department_name: 'Mechanical Engineering' },
-  { department_id: 4, department_code: 'DSE', department_name: 'Data Science & Engineering' }
-];
+// "09:00:00" -> "9:00 AM"
+function to12(t) {
+  const p = t.slice(0, 8).split(':');
+  let h = Number(p[0]);
+  const period = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + p[1] + ' ' + period;
+}
 
-const resources = [
-  { resource_code: 'LHC002', room_number: '002', resource_type: 'Lecture Hall', building: 'LHC Complex', capacity: 200, floor: 0, status: 'Available' },
-  { resource_code: '2AB016', room_number: '016', resource_type: 'Classroom', building: 'AB2', capacity: 80, floor: 0, status: 'Unavailable' },
-  { resource_code: '1AB102', room_number: '102', resource_type: 'Computer Lab', building: 'AB1', capacity: 60, floor: 1, status: 'Available' },
-  { resource_code: 'LHC202', room_number: '202', resource_type: 'Classroom', building: 'LHC Complex', capacity: 80, floor: 2, status: 'Maintenance' },
-  { resource_code: '1AB205', room_number: '205', resource_type: 'Seminar Hall', building: 'AB1', capacity: 120, floor: 2, status: 'Available' }
-];
+async function api(method, url, body) {
+  const res = await fetch(url, {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return { ok: res.ok, data: await res.json() };
+}
 
-const clubs = [
-  { club_id: 1, club_name: 'Coding Club', president_user_id: 2, faculty_user_id: 5 },
-  { club_id: 2, club_name: 'Robotics Society', president_user_id: 3, faculty_user_id: 6 },
-  { club_id: 3, club_name: 'Literary Club', president_user_id: null, faculty_user_id: 5 }
-];
+async function loadAdminData() {
+  const res = await fetch('/admin/overview');
+  const d = await res.json();
+  users = d.users; departments = d.departments; resources = d.resources;
+  clubs = d.clubs; complaints = d.complaints; timetable = d.timetable;
+  bookings = d.bookings.map(function (b) {
+    b.slots = b.slots
+      .filter(function (s) { return s.start_time; })
+      .sort(function (a, c) { return a.start_time.localeCompare(c.start_time); })
+      .map(function (s) { return to12(s.start_time) + ' - ' + to12(s.end_time); });
+    return b;
+  });
+}
 
-const currentAdmin = { user_id: 1, name: 'Admin' };
-
-const bookings = [
-  { booking_id: 1, user_id: 2, resource_code: '1AB102', club_id: 1, booking_date: '2026-10-20', purpose: 'Hackathon Practice', status: 'Approved', approved_by: 1, approval_date: '2026-10-05', slots: ['2:00 PM - 4:00 PM'] },
-  { booking_id: 2, user_id: 3, resource_code: '1AB102', club_id: 2, booking_date: '2026-10-20', purpose: 'Robotics Workshop', status: 'Pending', approved_by: null, approval_date: null, slots: ['3:00 PM - 5:00 PM'] },
-  { booking_id: 3, user_id: 5, resource_code: 'LHC002', club_id: null, booking_date: '2026-10-26', purpose: 'Extra Lecture', status: 'Pending', approved_by: null, approval_date: null, slots: ['10:00 AM - 12:00 PM'] },
-  { booking_id: 4, user_id: 2, resource_code: '1AB205', club_id: 1, booking_date: '2026-11-04', purpose: 'Tech Talk', status: 'Pending', approved_by: null, approval_date: null, slots: ['4:00 PM - 5:00 PM'] },
-  { booking_id: 5, user_id: 4, resource_code: '2AB016', club_id: null, booking_date: '2026-10-08', purpose: 'Study Session', status: 'Rejected', approved_by: 1, approval_date: '2026-10-06', slots: ['11:00 AM - 12:00 PM'] }
-];
-
-const complaints = [
-  { complaint_id: 1, title: 'Projector flickering', description: 'The projector in LHC002 is constantly flickering.', resource_code: 'LHC002', user_id: 2, status: 'Pending', created_date: '2026-10-02', resolved_by: null, resolved_date: null },
-  { complaint_id: 2, title: 'AC remote missing', description: 'AC remote is not available in room 102.', resource_code: '1AB102', user_id: 3, status: 'Pending', created_date: '2026-10-04', resolved_by: null, resolved_date: null },
-  { complaint_id: 3, title: 'Broken front row chair', description: 'Chair broken in 2AB016 front row.', resource_code: '2AB016', user_id: 4, status: 'Resolved', created_date: '2026-09-20', resolved_by: 1, resolved_date: '2026-09-22' },
-  { complaint_id: 4, title: 'Whiteboard marker tray damaged', description: 'Tray under whiteboard is coming loose.', resource_code: 'LHC202', user_id: 5, status: 'Resolved', created_date: '2026-09-25', resolved_by: 1, resolved_date: '2026-09-27' }
-];
-
-const timetable = [
-  { timetable_id: 1, subject_code: 'CS201', day: 'Monday', start_time: '10:00', end_time: '12:00', department_id: 1, resource_code: 'LHC002' },
-  { timetable_id: 2, subject_code: 'EC302', day: 'Tuesday', start_time: '14:00', end_time: '16:00', department_id: 2, resource_code: '2AB016' },
-  { timetable_id: 3, subject_code: 'CS305', day: 'Wednesday', start_time: '09:00', end_time: '11:00', department_id: 1, resource_code: '1AB102' },
-  { timetable_id: 4, subject_code: 'DS201', day: 'Friday', start_time: '11:00', end_time: '13:00', department_id: 4, resource_code: 'LHC202' }
-];
+// reload from the DB and redraw every tab
+async function refreshAll() {
+  await loadAdminData();
+  renderBookingsTab();
+  renderComplaintsTab();
+  renderClubsTab();
+  renderResourcesTab();
+  renderTimetableTab();
+  updateBadges();
+}
 
 // Convert YYYY-MM-DD to DD-MM-YYYY
 function formatDate(isoStr) {
@@ -453,89 +443,22 @@ function setupPendingBookingModal() {
     overlay.classList.add('open');
   });
 
-  approveBtn.addEventListener('click', function () {
-    const booking = bookings.find(function (b) { return b.booking_id === activeBookingId; });
-    if (!booking) return;
-
-    const res = findResource(booking.resource_code);
-
-    // Check (a): resource status must be Available
-    if (!res || res.status !== 'Available') {
-      showValidation('Cannot approve booking: resource ' + booking.resource_code + ' is currently ' + (res ? res.status : 'Unavailable') + '.');
-      return;
-    }
-
-    // Check (b): no conflict with another Approved booking on the same date and slot
-    let clashBooking = null;
-    bookings.forEach(function (other) {
-      if (other.booking_id === booking.booking_id) return;
-      if (other.status !== 'Approved') return;
-      if (other.resource_code !== booking.resource_code) return;
-      if (other.booking_date !== booking.booking_date) return;
-
-      booking.slots.forEach(function (slotA) {
-        const rangeA = parseSlotRange(slotA);
-        other.slots.forEach(function (slotB) {
-          const rangeB = parseSlotRange(slotB);
-          if (rangesOverlap(rangeA.start, rangeA.end, rangeB.start, rangeB.end)) {
-            clashBooking = other;
-          }
-        });
-      });
-    });
-
-    if (clashBooking) {
-      showValidation('Cannot approve booking: clashes with an already approved booking (ID #' + clashBooking.booking_id + ') on ' + formatDate(booking.booking_date) + '.');
-      return;
-    }
-
-    // Check (c): no conflict with timetable rows on that weekday
-    const weekday = getWeekday(booking.booking_date);
-    let clashTimetable = null;
-
-    timetable.forEach(function (row) {
-      if (row.resource_code !== booking.resource_code) return;
-      if (row.day.toLowerCase() !== weekday.toLowerCase()) return;
-
-      const rowStart = timeToMinutes(row.start_time);
-      const rowEnd = timeToMinutes(row.end_time);
-
-      booking.slots.forEach(function (slot) {
-        const slotRange = parseSlotRange(slot);
-        if (rangesOverlap(slotRange.start, slotRange.end, rowStart, rowEnd)) {
-          clashTimetable = row;
-        }
-      });
-    });
-
-    if (clashTimetable) {
-      showValidation('Cannot approve booking: clashes with timetable entry (' + clashTimetable.subject_code + ' on ' + clashTimetable.day + ' ' + clashTimetable.start_time + ' - ' + clashTimetable.end_time + ').');
-      return;
-    }
-
-    // All checks passed: approve booking
-    booking.status = 'Approved';
-    booking.approved_by = currentAdmin.user_id;
-    booking.approval_date = todayISO();
-
-    renderBookingsTab();
-    updateBadges();
+  approveBtn.addEventListener('click', async function () {
+    if (!activeBookingId) return;
+    const r = await api('PUT', '/admin/bookings/' + activeBookingId + '/approve');
+    if (!r.ok) { showValidation(r.data.error); return; }
+    await refreshAll();
     overlay.classList.remove('open');
-    showConfirmation('Booking Approved', 'Booking request #' + booking.booking_id + ' has been approved.');
+    showConfirmation('Booking Approved', 'Booking request #' + activeBookingId + ' has been approved.');
   });
 
-  rejectBtn.addEventListener('click', function () {
-    const booking = bookings.find(function (b) { return b.booking_id === activeBookingId; });
-    if (!booking) return;
-
-    booking.status = 'Rejected';
-    booking.approved_by = currentAdmin.user_id;
-    booking.approval_date = todayISO();
-
-    renderBookingsTab();
-    updateBadges();
+  rejectBtn.addEventListener('click', async function () {
+    if (!activeBookingId) return;
+    const r = await api('PUT', '/admin/bookings/' + activeBookingId + '/reject');
+    if (!r.ok) { showValidation(r.data.error); return; }
+    await refreshAll();
     overlay.classList.remove('open');
-    showConfirmation('Booking Rejected', 'Booking request #' + booking.booking_id + ' has been rejected.');
+    showConfirmation('Booking Rejected', 'Booking request #' + activeBookingId + ' has been rejected.');
   });
 
   closeBtn.addEventListener('click', function () {
@@ -625,16 +548,11 @@ function setupPendingComplaintModal() {
     overlay.classList.add('open');
   });
 
-  resolveBtn.addEventListener('click', function () {
-    const complaint = complaints.find(function (c) { return c.complaint_id === activeComplaintId; });
-    if (!complaint) return;
-
-    complaint.status = 'Resolved';
-    complaint.resolved_by = currentAdmin.user_id;
-    complaint.resolved_date = todayISO();
-
-    renderComplaintsTab();
-    updateBadges();
+  resolveBtn.addEventListener('click', async function () {
+    if (!activeComplaintId) return;
+    const r = await api('PUT', '/admin/complaints/' + activeComplaintId + '/resolve');
+    if (!r.ok) { showValidation(r.data.error); return; }
+    await refreshAll();
     overlay.classList.remove('open');
     showConfirmation('Complaint Resolved', 'The complaint has been marked as resolved.');
   });
@@ -701,35 +619,14 @@ function setupNewClubModal() {
     overlay.classList.add('open');
   });
 
-  submitBtn.addEventListener('click', function () {
+  submitBtn.addEventListener('click', async function () {
     const name = nameInput.value.trim();
+    if (!name) { showValidation('Please enter a club name.'); return; }
 
-    if (!name) {
-      showValidation('Please enter a club name.');
-      return;
-    }
+    const r = await api('POST', '/admin/clubs', { club_name: name });
+    if (!r.ok) { showValidation(r.data.error); return; }
 
-    const exists = clubs.some(function (c) {
-      return c.club_name.toLowerCase() === name.toLowerCase();
-    });
-
-    if (exists) {
-      showValidation('A club with the name "' + name + '" already exists.');
-      return;
-    }
-
-    const maxId = clubs.reduce(function (max, c) {
-      return c.club_id > max ? c.club_id : max;
-    }, 0);
-
-    clubs.push({
-      club_id: maxId + 1,
-      club_name: name,
-      president_user_id: null,
-      faculty_user_id: null
-    });
-
-    renderClubsTab();
+    await refreshAll();
     overlay.classList.remove('open');
     nameInput.value = '';
     showConfirmation('Club Created', 'The club "' + name + '" has been registered.');
@@ -811,16 +708,20 @@ function setupManageClubModal() {
   presSelect.addEventListener('change', checkForClubChanges);
   advSelect.addEventListener('change', checkForClubChanges);
 
-  saveBtn.addEventListener('click', function () {
+  saveBtn.addEventListener('click', async function () {
     const club = clubs.find(function (c) { return c.club_id === activeClubId; });
     if (!club) return;
 
-    club.president_user_id = presSelect.value ? Number(presSelect.value) : null;
-    club.faculty_user_id = advSelect.value ? Number(advSelect.value) : null;
+    const r = await api('PUT', '/admin/clubs/' + activeClubId, {
+      president_user_id: presSelect.value ? Number(presSelect.value) : null,
+      faculty_user_id: advSelect.value ? Number(advSelect.value) : null
+    });
+    if (!r.ok) { showValidation(r.data.error); return; }
 
-    renderClubsTab();
+    const clubName = club.club_name;
+    await refreshAll();
     overlay.classList.remove('open');
-    showConfirmation('Club Updated', 'Leadership for ' + club.club_name + ' has been updated.');
+    showConfirmation('Club Updated', 'Leadership for ' + clubName + ' has been updated.');
   });
 
   closeBtn.addEventListener('click', function () {
@@ -853,6 +754,7 @@ function setupResourceModal() {
   let activeCode = '';
   let originalData = {};
 
+  // in edit mode, Save is enabled only when something changed
   function checkForResourceChanges() {
     if (!isEditMode) return;
     const changed = roomInput.value.trim() !== originalData.room
@@ -861,11 +763,10 @@ function setupResourceModal() {
       || capInput.value.trim() !== originalData.capacity
       || floorInput.value.trim() !== originalData.floor
       || statusSelect.value !== originalData.status;
-
     saveBtn.disabled = !changed;
   }
 
-  // Open in Add Mode
+  // Open in Add mode
   openBtn.addEventListener('click', function () {
     isEditMode = false;
     activeCode = '';
@@ -882,7 +783,7 @@ function setupResourceModal() {
     overlay.classList.add('open');
   });
 
-  // Open in Edit Mode
+  // Open in Edit mode
   grid.addEventListener('click', function (event) {
     if (!event.target.classList.contains('edit-resource-link')) return;
 
@@ -921,80 +822,47 @@ function setupResourceModal() {
   });
   statusSelect.addEventListener('change', checkForResourceChanges);
 
-  saveBtn.addEventListener('click', function () {
+  saveBtn.addEventListener('click', async function () {
     const code = codeInput.value.trim().toUpperCase();
     const room = roomInput.value.trim();
     const type = typeInput.value.trim();
     const build = buildInput.value.trim();
-    const capStr = capInput.value.trim();
-    const floorStr = floorInput.value.trim();
+    const capNum = parseInt(capInput.value.trim(), 10);
+    const floorNum = parseInt(floorInput.value.trim(), 10);
     const status = statusSelect.value;
 
     if (!isEditMode && (!code || code.length > 10)) {
       showValidation('Please enter a valid resource code (max 10 characters).');
       return;
     }
-
     if (!room || room.length > 10) {
       showValidation('Please enter a valid room number (max 10 characters).');
       return;
     }
-
     if (!type || !build) {
       showValidation('Please fill in both the resource type and building.');
       return;
     }
-
-    const capNum = parseInt(capStr, 10);
     if (isNaN(capNum) || capNum <= 0) {
       showValidation('Capacity must be a positive integer greater than 0.');
       return;
     }
-
-    const floorNum = parseInt(floorStr, 10);
     if (isNaN(floorNum) || floorNum < 0) {
       showValidation('Floor must be a valid non-negative integer (0 or greater).');
       return;
     }
 
-    if (!isEditMode) {
-      const duplicate = resources.some(function (r) {
-        return r.resource_code.toLowerCase() === code.toLowerCase();
-      });
+    const body = { resource_code: code, room_number: room, resource_type: type,
+                   building: build, capacity: capNum, floor: floorNum, status: status };
+    const r = isEditMode
+      ? await api('PUT', '/admin/resources/' + activeCode, body)
+      : await api('POST', '/admin/resources', body);
+    if (!r.ok) { showValidation(r.data.error); return; }
 
-      if (duplicate) {
-        showValidation('Resource code "' + code + '" already exists.');
-        return;
-      }
-
-      resources.push({
-        resource_code: code,
-        room_number: room,
-        resource_type: type,
-        building: build,
-        capacity: capNum,
-        floor: floorNum,
-        status: status
-      });
-
-      renderResourcesTab();
-      overlay.classList.remove('open');
-      showConfirmation('Resource Added', 'Resource ' + code + ' has been created successfully.');
-    } else {
-      const res = findResource(activeCode);
-      if (!res) return;
-
-      res.room_number = room;
-      res.resource_type = type;
-      res.building = build;
-      res.capacity = capNum;
-      res.floor = floorNum;
-      res.status = status;
-
-      renderResourcesTab();
-      overlay.classList.remove('open');
-      showConfirmation('Resource Updated', 'Resource ' + res.resource_code + ' has been updated successfully.');
-    }
+    await refreshAll();
+    overlay.classList.remove('open');
+    showConfirmation(isEditMode ? 'Resource Updated' : 'Resource Added',
+      'Resource ' + (isEditMode ? activeCode : code) + ' has been saved successfully.');
   });
 
   closeBtn.addEventListener('click', function () {
@@ -1187,25 +1055,11 @@ function setupTimetableUpload() {
   }
 
   // Confirm and save uploaded timetable entries
-  confirmBtn.addEventListener('click', function () {
+  confirmBtn.addEventListener('click', async function () {
     if (stagedRows.length === 0) return;
 
-    let maxId = timetable.reduce(function (max, t) {
-      return t.timetable_id > max ? t.timetable_id : max;
-    }, 0);
-
-    stagedRows.forEach(function (r) {
-      maxId += 1;
-      timetable.push({
-        timetable_id: maxId,
-        subject_code: r.subject_code,
-        day: r.day,
-        start_time: r.start_time,
-        end_time: r.end_time,
-        department_id: r.department_id,
-        resource_code: r.resource_code
-      });
-    });
+    const r = await api('POST', '/admin/timetable', { rows: stagedRows });
+    if (!r.ok) { showValidation(r.data.error); return; }
 
     const count = stagedRows.length;
     stagedRows = [];
@@ -1213,7 +1067,7 @@ function setupTimetableUpload() {
     fileInput.value = '';
     filenameEl.textContent = 'No file chosen';
 
-    renderTimetableTab();
+    await refreshAll();
     showConfirmation('Timetable Uploaded', count + ' entries added to the timetable successfully.');
   });
 }
@@ -1240,9 +1094,10 @@ function setupUtilityModals() {
   });
 }
 
-commonReady.then(function () {
+commonReady.then(async function () {
   setupUtilityModals();
   if (!isAdmin) return;
+  await loadAdminData();
   renderBookingsTab();
   renderComplaintsTab();
   renderClubsTab();
