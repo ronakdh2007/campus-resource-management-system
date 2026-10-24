@@ -1240,8 +1240,9 @@ function setupUtilityModals() {
   });
 }
 
-// Initialise page if user has administrator access
-if (typeof isAdmin !== 'undefined' && isAdmin) {
+commonReady.then(function () {
+  setupUtilityModals();
+  if (!isAdmin) return;
   renderBookingsTab();
   renderComplaintsTab();
   renderClubsTab();
@@ -1258,6 +1259,4 @@ if (typeof isAdmin !== 'undefined' && isAdmin) {
   setupManageClubModal();
   setupResourceModal();
   setupTimetableUpload();
-}
-
-setupUtilityModals();
+});

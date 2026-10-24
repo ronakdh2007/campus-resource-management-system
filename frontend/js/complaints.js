@@ -309,13 +309,15 @@ function setupUtilityModals() {
   });
 }
 
-applyAccessGate();
-
-if (canAccess) {
-  renderComplaints();
-  setupNewComplaintModal();
-  setupEditComplaintModal();
-  setupResolvedComplaintModal();
+async function init() {
+  await commonReady;
+  applyAccessGate();
+  setupUtilityModals();
+  if (canAccess) {
+    renderComplaints();
+    setupNewComplaintModal();
+    setupEditComplaintModal();
+    setupResolvedComplaintModal();
+  }
 }
-
-setupUtilityModals();
+init();

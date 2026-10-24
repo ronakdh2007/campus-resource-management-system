@@ -327,6 +327,7 @@ function applyFilters() {
 
 async function init() {
   try {
+    await commonReady;
     await loadResources();
   } catch (err) {
     console.error(err);

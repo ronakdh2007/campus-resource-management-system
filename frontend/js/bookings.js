@@ -283,11 +283,13 @@ function checkForChanges() {
 }
 
 async function init() {
+  await commonReady;
+  applyAccessGate();
+  if (!canAccess) return;
   await loadBookings();
   renderAllBookings();
   setupCurrentBookingModal();
   setupHistoryModal();
   setupEditSlotDropdown();
-  applyAccessGate();
 }
 init();

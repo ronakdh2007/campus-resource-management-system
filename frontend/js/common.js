@@ -1,9 +1,13 @@
-// TODO: replace with real auth check from backend.
-// Faculty: always true. Student: true only if they are a club president.
-const canAccess = true;
+let canAccess = false;
+let isAdmin = false;
+let me = null;
 
-// TODO: replace with real admin check from backend.
-const isAdmin = true;
+async function loadMe() {
+  const res = await fetch('/me');
+  me = await res.json();
+  canAccess = me.canAccess;
+  isAdmin = me.isAdmin;
+}
 
 // Interactivity for the profile dropdown
 function setupProfileDropdown(){
@@ -127,6 +131,12 @@ function applyAdminGate() {
 
 setupProfileDropdown();
 setupSidebarToggle();
-setupAdminSidebarLink();
-setupActiveSidebarLink();
-applyAdminGate();
+
+// everything that needs to know the role waits for /me
+async function initCommon() {
+  await loadMe();
+  setupAdminSidebarLink();
+  setupActiveSidebarLink(); // after the Admin link is added, so it can highlight
+  applyAdminGate();
+}
+const commonReady = initCommon();
