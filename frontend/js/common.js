@@ -153,8 +153,19 @@ function applyAdminGate() {
   }
 }
 
+// Sign out. Placeholder until real login exists: just go back to the login page.
+function setupSignOut() {
+  const btn = document.querySelector('.signout-button');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    // with real login, call fetch('/logout', { method: 'POST' }) here first
+    window.location.href = '/pages/login.html';
+  });
+}
+
 setupProfileDropdown();
 setupSidebarToggle();
+setupSignOut();
 
 // everything that needs to know the role waits for /me
 async function initCommon() {
