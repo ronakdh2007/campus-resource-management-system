@@ -57,17 +57,41 @@ function setupSidebarToggle(){
   });
 }
 
-// Append Admin link to sidebar if user is an administrator
+// Admin sees ONLY the Admin link
 function setupAdminSidebarLink(){
   if (!isAdmin) return;
   const sidebarUl = document.querySelector('.sidebar ul');
   if (!sidebarUl) return;
+  sidebarUl.innerHTML = '';
   const li = document.createElement('li');
   li.innerHTML = '<a href="admin.html" class="sidebar-links">'
-    + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check-icon lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>'
+    + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>'
     + '<span>Admin</span>'
     + '</a>';
   sidebarUl.appendChild(li);
+}
+
+// Admin lands on admin.html (profile stays reachable from the header dropdown)
+function redirectAdminHome() {
+  if (!isAdmin) return;
+  const page = window.location.pathname.split('/').pop();
+  if (page !== 'admin.html' && page !== 'profile.html') window.location.replace('admin.html');
+}
+
+// Students who are not presidents only keep Dashboard and Profile in the sidebar
+function trimSidebarForStudents() {
+  if (isAdmin || canAccess) return;
+  document.querySelectorAll('.sidebar-links').forEach(function (a) {
+    const p = a.getAttribute('href');
+    if (p === 'resources.html' || p === 'bookings.html' || p === 'complaints.html') a.closest('li').remove();
+  });
+}
+
+// Show the logged-in user's name wherever these hooks exist
+function applyUserName() {
+  document.querySelectorAll('#header-username, .js-username').forEach(function (el) {
+    el.textContent = me.name;
+  });
 }
 
 // To show the current active sidebar
@@ -135,8 +159,11 @@ setupSidebarToggle();
 // everything that needs to know the role waits for /me
 async function initCommon() {
   await loadMe();
+  redirectAdminHome();
   setupAdminSidebarLink();
-  setupActiveSidebarLink(); // after the Admin link is added, so it can highlight
+  trimSidebarForStudents();
+  setupActiveSidebarLink();
   applyAdminGate();
+  applyUserName();
 }
 const commonReady = initCommon();
