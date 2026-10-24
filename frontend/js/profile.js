@@ -1,21 +1,20 @@
-// Temporary hardcoded user data matching database schema
-const currentUser = {
-  user_id: 2,
-  name: 'Aarav Sharma',
-  email: 'aarav.2410101001@muj.manipal.edu',
-  phone: '+91 9876543210',
-  role: 'Student',
-  department_id: 1,
-  club_affiliation: 'Coding Club (President)'
-};
+let currentUser = null;
+let departments = [];
 
-// Department list matching the database table
-const departments = [
-  { department_id: 1, department_code: 'CSE', department_name: 'Computer Science & Engineering' },
-  { department_id: 2, department_code: 'ECE', department_name: 'Electronics & Communication Engineering' },
-  { department_id: 3, department_code: 'MECH', department_name: 'Mechanical Engineering' },
-  { department_id: 4, department_code: 'DSE', department_name: 'Data Science & Engineering' }
-];
+async function loadProfileData() {
+  const [meRes, depRes] = await Promise.all([fetch('/me'), fetch('/departments')]);
+  const me = await meRes.json();
+  departments = await depRes.json();
+  currentUser = {
+    user_id: me.user_id,
+    name: me.name,
+    email: me.email,
+    phone: me.phone,
+    role: me.role,
+    department_id: me.department_id,
+    club_affiliation: me.club ? me.club.club_name + ' (President)' : null
+  };
+}
 
 // Original profile values to track form modifications
 let originalName = '';
@@ -136,35 +135,35 @@ function setupProfileForm() {
   deptSelect.addEventListener('change', checkForProfileChanges);
   phoneInput.addEventListener('input', checkForProfileChanges);
 
-  saveBtn.addEventListener('click', function () {
+  saveBtn.addEventListener('click', async function () {
     const name = nameInput.value.trim();
     const deptId = deptSelect.value;
     const phone = phoneInput.value.trim();
 
-    if (!name) {
-      showValidation('Please enter your full name.');
-      return;
-    }
-
-    if (!deptId) {
-      showValidation('Please select a department.');
-      return;
-    }
-
+    if (!name) { showValidation('Please enter your full name.'); return; }
+    if (!deptId) { showValidation('Please select a department.'); return; }
     if (phone && phone.length < 7) {
       showValidation('Please enter a valid phone number (at least 7 characters).');
       return;
     }
 
+    const res = await fetch('/me', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, phone: phone, department_id: Number(deptId) })
+    });
+    const data = await res.json();
+    if (!res.ok) { showValidation(data.error); return; }
+
     currentUser.name = name;
     currentUser.department_id = Number(deptId);
     currentUser.phone = phone;
-
-    originalName = currentUser.name;
-    originalDept = String(currentUser.department_id);
-    originalPhone = currentUser.phone;
+    originalName = name;
+    originalDept = String(deptId);
+    originalPhone = phone;
 
     renderProfileOverview();
+    document.querySelectorAll('.js-username').forEach(function (el) { el.textContent = name; });
     saveBtn.disabled = true;
     showConfirmation('Profile Updated', 'Your personal details have been updated successfully.');
   });
@@ -192,8 +191,13 @@ function setupUtilityModals() {
   });
 }
 
-populateDepartmentSelect();
-renderProfileOverview();
-populateProfileForm();
-setupProfileForm();
-setupUtilityModals();
+async function initProfile() {
+  await commonReady;
+  setupUtilityModals();
+  await loadProfileData();
+  populateDepartmentSelect();
+  renderProfileOverview();
+  populateProfileForm();
+  setupProfileForm();
+}
+initProfile();
