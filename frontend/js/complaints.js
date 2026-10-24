@@ -1,18 +1,11 @@
-// Temporary hardcoded data — field names match DB columns exactly
-const complaints = [
-  { complaint_id: 1, title: 'Projector not working', description: 'The projector does not turn on.', resource_code: '1AB102', status: 'Pending', created_date: '2026-10-03', resolved_date: null },
-  { complaint_id: 2, title: 'AC not cooling', description: 'The AC runs but the room stays hot.', resource_code: 'LHC002', status: 'Pending', created_date: '2026-10-01', resolved_date: null },
-  { complaint_id: 3, title: 'Broken chairs in front row', description: 'Three chairs in the front row are broken.', resource_code: '2AB016', status: 'Resolved', created_date: '2026-09-20', resolved_date: '2026-09-22' },
-  { complaint_id: 4, title: 'WiFi not working', description: 'No WiFi signal in the room.', resource_code: 'LHC202', status: 'Resolved', created_date: '2026-09-10', resolved_date: '2026-09-12' }
-];
+let complaints = [];
+let campusResources = [];
 
-// TODO: move to common.js in the cleanup pass — same resource list as resources.js
-const campusResources = [
-  { resource_code: 'LHC002', resource_type: 'Lecture Hall', building: 'LHC Complex' },
-  { resource_code: '2AB016', resource_type: 'Classroom',    building: 'AB2' },
-  { resource_code: '1AB102', resource_type: 'Computer Lab', building: 'AB1' },
-  { resource_code: 'LHC202', resource_type: 'Classroom',    building: 'LHC' }
-];
+async function loadData() {
+  const [resRes, compRes] = await Promise.all([fetch('/resources'), fetch('/complaints')]);
+  campusResources = await resRes.json();
+  complaints = await compRes.json();
+}
 
 // Convert 'YYYY-MM-DD' to 'DD-MM-YYYY' — avoid new Date() to prevent timezone bugs
 function formatDate(isoStr) {
@@ -124,7 +117,7 @@ function setupNewComplaintModal() {
     if (event.target === overlay) overlay.classList.remove('open');
   });
 
-  submitBtn.addEventListener('click', function () {
+  submitBtn.addEventListener('click', async function () {
     const code  = selectEl.value;
     const title = titleEl.value.trim();
     const desc  = descEl.value.trim();
@@ -134,20 +127,15 @@ function setupNewComplaintModal() {
       return;
     }
 
-    const maxId = complaints.reduce(function (max, c) {
-      return c.complaint_id > max ? c.complaint_id : max;
-    }, 0);
-
-    complaints.push({
-      complaint_id:  maxId + 1,
-      title:         title,
-      description:   desc,
-      resource_code: code,
-      status:        'Pending',
-      created_date:  todayISO(),
-      resolved_date: null
+    const res = await fetch('/complaints', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resource_code: code, title: title, description: desc })
     });
+    const data = await res.json();
+    if (!res.ok) { showValidation(data.error); return; }
 
+    await loadData();
     renderComplaints();
     overlay.classList.remove('open');
     titleEl.value  = '';
@@ -231,7 +219,7 @@ function setupEditComplaintModal() {
     if (event.target === overlay) overlay.classList.remove('open');
   });
 
-  saveBtn.addEventListener('click', function () {
+  saveBtn.addEventListener('click', async function () {
     const title = titleEl.value.trim();
     const desc  = descEl.value.trim();
 
@@ -240,11 +228,15 @@ function setupEditComplaintModal() {
       return;
     }
 
-    const complaint = complaints.find(function (c) { return c.complaint_id === activeId; });
-    complaint.resource_code = selectEl.value;
-    complaint.title         = title;
-    complaint.description   = desc;
+    const res = await fetch('/complaints/' + activeId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resource_code: selectEl.value, title: title, description: desc })
+    });
+    const data = await res.json();
+    if (!res.ok) { showValidation(data.error); return; }
 
+    await loadData();
     renderComplaints();
     overlay.classList.remove('open');
     showConfirmation('Complaint Changes Saved', 'Your changes to the complaint have been saved.');
@@ -314,6 +306,7 @@ async function init() {
   applyAccessGate();
   setupUtilityModals();
   if (canAccess) {
+    await loadData();
     renderComplaints();
     setupNewComplaintModal();
     setupEditComplaintModal();
