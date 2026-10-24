@@ -21,7 +21,7 @@ app.get('/resources', async (req, res) => {
 
 // TEMPORARY until Microsoft login exists: pretend this user is logged in
 // 2 = Aarav (club president), 5 = Rohit (faculty), 1 = Meera (admin)
-const CURRENT_USER_ID = 2;
+const CURRENT_USER_ID = 1;
 
 async function getCurrentUser() {
   const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [CURRENT_USER_ID]);
@@ -76,6 +76,39 @@ app.get('/me', attachUser, async (req, res) => {
     canAccess: await canBook(u),
     isAdmin: u.role === 'Admin'
   });
+});
+
+// ---------- departments list (for the profile dropdown) ----------
+app.get('/departments', attachUser, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT department_id, department_code, department_name FROM department ORDER BY department_name');
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch departments' });
+  }
+});
+
+// ---------- update my own details (name, phone, department only) ----------
+app.put('/me', attachUser, async (req, res) => {
+  try {
+    const name = (req.body.name || '').trim();
+    const phone = (req.body.phone || '').trim() || null;
+    const deptId = Number(req.body.department_id);
+
+    if (!name || name.length > 100) return res.status(400).json({ error: 'Please enter a valid name.' });
+    if (phone && (phone.length < 7 || phone.length > 20)) return res.status(400).json({ error: 'Please enter a valid phone number.' });
+
+    const [d] = await pool.query('SELECT 1 FROM department WHERE department_id = ?', [deptId]);
+    if (d.length === 0) return res.status(400).json({ error: 'Please select a valid department.' });
+
+    await pool.query('UPDATE users SET name = ?, phone = ?, department_id = ? WHERE user_id = ?',
+      [name, phone, deptId, req.user.user_id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
 });
 
 // ---------- my bookings (with slots) ----------
