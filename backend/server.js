@@ -21,7 +21,7 @@ app.get('/resources', async (req, res) => {
 
 // TEMPORARY until Microsoft login exists: pretend this user is logged in
 // 2 = Aarav (club president), 5 = Rohit (faculty), 1 = Meera (admin)
-const CURRENT_USER_ID = 4;
+const CURRENT_USER_ID = 2;
 
 async function getCurrentUser() {
   const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [CURRENT_USER_ID]);
@@ -327,6 +327,27 @@ app.put('/bookings/:id/cancel', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to cancel booking' });
+  }
+});
+
+// ---------- dashboard counts for the logged-in user ----------
+app.get('/dashboard', attachUser, async (req, res) => {
+  try {
+    const [[b]] = await pool.query(
+      `SELECT COUNT(*) AS total, COALESCE(SUM(status = 'Pending'), 0) AS pending
+       FROM booking_request WHERE user_id = ?`, [req.user.user_id]);
+    const [[c]] = await pool.query(
+      `SELECT COUNT(*) AS total,
+              COALESCE(SUM(status = 'Resolved'), 0) AS resolved,
+              COALESCE(SUM(status = 'Pending'), 0) AS pending
+       FROM complaint WHERE user_id = ?`, [req.user.user_id]);
+    res.json({
+      bookings: { total: Number(b.total), pending: Number(b.pending) },
+      complaints: { total: Number(c.total), resolved: Number(c.resolved), pending: Number(c.pending) }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load dashboard' });
   }
 });
 

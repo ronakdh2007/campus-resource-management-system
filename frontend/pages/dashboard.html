@@ -78,7 +78,7 @@
   
   <!-- Main Page Content -->
   <main class="page-content">
-    <h1 class="welcome-heading">Welcome, <span class="username-highlight">username</span></h1>
+    <h1 class="welcome-heading">Welcome, <span class="username-highlight js-username"></span></h1>
 
     <section class="dashboard-section">
       <a href="bookings.html" class="section-heading-link">
@@ -88,11 +88,11 @@
       <div class="stat-cards">
         <div class="stat-card">
           <p class="stat-label">Total Bookings</p>
-          <p class="stat-number">12</p>
+          <p class="stat-number" id="stat-bookings-total">0</p>
         </div>
         <div class="stat-card">
           <p class="stat-label">Pending Bookings</p>
-          <p class="stat-number">3</p>
+          <p class="stat-number" id="stat-bookings-pending">0</p>
         </div>
       </div>
     </section>
@@ -109,15 +109,15 @@
       <div class="stat-cards">
         <div class="stat-card">
           <p class="stat-label">Total Complaints</p>
-          <p class="stat-number">5</p>
+          <p class="stat-number" id="stat-complaints-total">0</p>
         </div>
         <div class="stat-card">
           <p class="stat-label">Resolved Complaints</p>
-          <p class="stat-number">4</p>
+          <p class="stat-number" id="stat-complaints-resolved">0</p>
         </div>
         <div class="stat-card">
           <p class="stat-label">Pending Complaints</p>
-          <p class="stat-number">1</p>
+          <p class="stat-number" id="stat-complaints-pending">0</p>
         </div>
       </div>
     </section>
@@ -125,6 +125,7 @@
   
   <!-- Common JS file (Header Bar, Sidebar interactivity) -->
   <script src="../js/common.js"></script>
+  <script src="../js/dashboard.js"></script>
   
 </body>
 </html>
