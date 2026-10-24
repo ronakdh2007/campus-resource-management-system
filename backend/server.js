@@ -140,6 +140,98 @@ app.post('/bookings', async (req, res) => {
   }
 });
 
+// ---------- shared clash check (used by edit now, admin approve later) ----------
+async function checkClashes(conn, resource_code, booking_date, slots, excludeBookingId = 0) {
+  for (const s of slots) {
+    const [c1] = await conn.query(
+      `SELECT 1 FROM booking_request b JOIN booking_slot bs ON bs.booking_id = b.booking_id
+       WHERE b.resource_code = ? AND b.booking_date = ? AND b.status = 'Approved'
+         AND b.booking_id <> ? AND bs.start_time < ? AND bs.end_time > ? LIMIT 1`,
+      [resource_code, booking_date, excludeBookingId, s.end_time, s.start_time]
+    );
+    if (c1.length) throw { status: 409, message: 'That slot is already booked.' };
+
+    const [c2] = await conn.query(
+      `SELECT 1 FROM timetable
+       WHERE resource_code = ? AND \`day\` = DAYNAME(?) AND start_time < ? AND end_time > ? LIMIT 1`,
+      [resource_code, booking_date, s.end_time, s.start_time]
+    );
+    if (c2.length) throw { status: 409, message: 'A class is scheduled in that slot.' };
+  }
+}
+
+// ---------- edit my booking (rule 5) ----------
+app.put('/bookings/:id', async (req, res) => {
+  const bookingId = Number(req.params.id);
+  const { booking_date, purpose, slots } = req.body;
+  const conn = await pool.getConnection();
+  try {
+    if (!booking_date || !purpose || !Array.isArray(slots) || slots.length === 0) {
+      throw { status: 400, message: 'Missing booking details.' };
+    }
+    const today = new Date().toLocaleDateString('en-CA');
+    if (booking_date < today) throw { status: 400, message: 'Booking date cannot be in the past.' };
+    for (const s of slots) {
+      if (s.end_time <= s.start_time) throw { status: 400, message: 'A slot must end after it starts.' };
+    }
+
+    await conn.beginTransaction();
+
+    // only my own booking, and lock it
+    const [rows] = await conn.query(
+      'SELECT resource_code, status FROM booking_request WHERE booking_id = ? AND user_id = ? FOR UPDATE',
+      [bookingId, CURRENT_USER_ID]
+    );
+    if (rows.length === 0) throw { status: 404, message: 'Booking not found.' };
+    if (!['Pending', 'Approved'].includes(rows[0].status)) {
+      throw { status: 409, message: 'Only pending or approved bookings can be edited.' };
+    }
+    const resource_code = rows[0].resource_code;
+
+    const [rooms] = await conn.query('SELECT status FROM resource WHERE resource_code = ? FOR UPDATE', [resource_code]);
+    if (rooms[0].status !== 'Available') throw { status: 409, message: 'This room is not available for booking.' };
+
+    await checkClashes(conn, resource_code, booking_date, slots, bookingId);
+
+    // delete old slots, insert new, reset to Pending: all in ONE transaction
+    await conn.query('DELETE FROM booking_slot WHERE booking_id = ?', [bookingId]);
+    await conn.query('INSERT INTO booking_slot (booking_id, start_time, end_time) VALUES ?',
+      [slots.map(s => [bookingId, s.start_time, s.end_time])]);
+    await conn.query(
+      `UPDATE booking_request
+       SET booking_date = ?, purpose = ?, status = 'Pending', approved_by = NULL, approval_date = NULL
+       WHERE booking_id = ?`,
+      [booking_date, purpose, bookingId]
+    );
+
+    await conn.commit();
+    res.json({ ok: true });
+  } catch (err) {
+    await conn.rollback();
+    if (err.status) return res.status(err.status).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update booking' });
+  } finally {
+    conn.release();
+  }
+});
+
+// ---------- cancel my booking ----------
+app.put('/bookings/:id/cancel', async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      `UPDATE booking_request SET status = 'Cancelled'
+       WHERE booking_id = ? AND user_id = ? AND status IN ('Pending','Approved')`,
+      [Number(req.params.id), CURRENT_USER_ID]
+    );
+    if (result.affectedRows === 0) return res.status(409).json({ error: 'Booking cannot be cancelled.' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to cancel booking' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
