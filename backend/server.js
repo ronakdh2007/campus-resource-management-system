@@ -21,12 +21,62 @@ app.get('/resources', async (req, res) => {
 
 // TEMPORARY until Microsoft login exists: pretend this user is logged in
 // 2 = Aarav (club president), 5 = Rohit (faculty), 1 = Meera (admin)
-const CURRENT_USER_ID = 2;
+const CURRENT_USER_ID = 1;
 
 async function getCurrentUser() {
   const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [CURRENT_USER_ID]);
   return rows[0];
 }
+
+// ---------- access control : enforced on the server, not just the frontend ----------
+async function attachUser(req, res, next) {
+  try {
+    req.user = await getCurrentUser();
+    if (!req.user) return res.status(401).json({ error: 'Not logged in.' });
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Auth failed' });
+  }
+}
+
+// Faculty always; a Student only if they are a club president; Admin never books
+async function canBook(user) {
+  if (user.role === 'Faculty') return true;
+  if (user.role === 'Student') {
+    const [c] = await pool.query('SELECT 1 FROM club WHERE president_user_id = ? LIMIT 1', [user.user_id]);
+    return c.length > 0;
+  }
+  return false;
+}
+
+async function requireBooker(req, res, next) {
+  if (!(await canBook(req.user))) return res.status(403).json({ error: 'You do not have access to this.' });
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'Admin') return res.status(403).json({ error: 'Admin only.' });
+  next();
+}
+
+// these run BEFORE the routes below, for every /bookings... and /complaints... request
+app.use('/bookings', attachUser, requireBooker);
+app.use('/complaints', attachUser, requireBooker);
+app.use('/admin', attachUser, requireAdmin);
+
+// ---------- who am I (feeds the frontend access gate) ----------
+app.get('/me', attachUser, async (req, res) => {
+  const u = req.user;
+  const [clubs] = await pool.query('SELECT club_id, club_name FROM club WHERE president_user_id = ?', [u.user_id]);
+  res.json({
+    user_id: u.user_id, name: u.name, email: u.email, phone: u.phone,
+    role: u.role, department_id: u.department_id,
+    club: clubs[0] || null,
+    canAccess: await canBook(u),
+    isAdmin: u.role === 'Admin'
+  });
+});
 
 // ---------- my bookings (with slots) ----------
 app.get('/bookings', async (req, res) => {
