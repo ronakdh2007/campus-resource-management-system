@@ -21,7 +21,7 @@ app.get('/resources', async (req, res) => {
 
 // TEMPORARY until Microsoft login exists: pretend this user is logged in
 // 2 = Aarav (club president), 5 = Rohit (faculty), 1 = Meera (admin)
-const CURRENT_USER_ID = 2;
+const CURRENT_USER_ID = 4;
 
 async function getCurrentUser() {
   const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [CURRENT_USER_ID]);
@@ -328,6 +328,172 @@ app.put('/bookings/:id/cancel', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Failed to cancel booking' });
   }
+});
+
+// ---------- admin routes (the /admin prefix is already protected by attachUser + requireAdmin) ----------
+function sendError(res, err, fallback) {
+  if (err.status) return res.status(err.status).json({ error: err.message });
+  if (err.code === 'ER_DUP_ENTRY') return res.status(409).json({ error: 'That name, code or president is already in use.' });
+  console.error(err);
+  res.status(500).json({ error: fallback });
+}
+
+// everything the admin page needs, in one call
+app.get('/admin/overview', async (req, res) => {
+  try {
+    const [users] = await pool.query('SELECT user_id, name, email, role, department_id FROM users');
+    const [departments] = await pool.query('SELECT * FROM department');
+    const [resources] = await pool.query('SELECT * FROM resource');
+    const [clubs] = await pool.query('SELECT * FROM club');
+    const [bookings] = await pool.query(
+      `SELECT b.booking_id, b.user_id, b.resource_code, b.club_id, b.booking_date, b.purpose, b.status,
+              b.approved_by, DATE(b.approval_date) AS approval_date,
+              JSON_ARRAYAGG(JSON_OBJECT('start_time', s.start_time, 'end_time', s.end_time)) AS slots
+       FROM booking_request b LEFT JOIN booking_slot s ON s.booking_id = b.booking_id
+       GROUP BY b.booking_id ORDER BY b.booking_id`
+    );
+    const [complaints] = await pool.query(
+      `SELECT complaint_id, title, description, resource_code, user_id, status,
+              DATE(created_date) AS created_date, resolved_by, DATE(resolved_date) AS resolved_date
+       FROM complaint ORDER BY complaint_id`
+    );
+    const [timetable] = await pool.query(
+      `SELECT timetable_id, subject_code, \`day\`, TIME_FORMAT(start_time, '%H:%i') AS start_time,
+              TIME_FORMAT(end_time, '%H:%i') AS end_time, department_id, resource_code
+       FROM timetable`
+    );
+    res.json({ users, departments, resources, clubs, bookings, complaints, timetable });
+  } catch (err) { sendError(res, err, 'Failed to load admin data'); }
+});
+
+// approve: re-run the clash check inside a transaction (rule 4)
+app.put('/admin/bookings/:id/approve', async (req, res) => {
+  const id = Number(req.params.id);
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [rows] = await conn.query(
+      'SELECT resource_code, booking_date, status FROM booking_request WHERE booking_id = ? FOR UPDATE', [id]);
+    if (!rows.length) throw { status: 404, message: 'Booking not found.' };
+    if (rows[0].status !== 'Pending') throw { status: 409, message: 'Only pending bookings can be approved.' };
+    const { resource_code, booking_date } = rows[0];
+
+    const [rooms] = await conn.query('SELECT status FROM resource WHERE resource_code = ? FOR UPDATE', [resource_code]);
+    if (rooms[0].status !== 'Available') throw { status: 409, message: 'Cannot approve: resource is ' + rooms[0].status + '.' };
+
+    const [slots] = await conn.query('SELECT start_time, end_time FROM booking_slot WHERE booking_id = ?', [id]);
+    await checkClashes(conn, resource_code, booking_date, slots, id);
+
+    await conn.query(
+      `UPDATE booking_request SET status = 'Approved', approved_by = ?, approval_date = NOW() WHERE booking_id = ?`,
+      [req.user.user_id, id]);
+    await conn.commit();
+    res.json({ ok: true });
+  } catch (err) {
+    await conn.rollback();
+    sendError(res, err, 'Failed to approve booking');
+  } finally { conn.release(); }
+});
+
+app.put('/admin/bookings/:id/reject', async (req, res) => {
+  try {
+    const [r] = await pool.query(
+      `UPDATE booking_request SET status = 'Rejected', approved_by = ?, approval_date = NOW()
+       WHERE booking_id = ? AND status = 'Pending'`, [req.user.user_id, Number(req.params.id)]);
+    if (r.affectedRows === 0) return res.status(409).json({ error: 'Only pending bookings can be rejected.' });
+    res.json({ ok: true });
+  } catch (err) { sendError(res, err, 'Failed to reject booking'); }
+});
+
+app.put('/admin/complaints/:id/resolve', async (req, res) => {
+  try {
+    const [r] = await pool.query(
+      `UPDATE complaint SET status = 'Resolved', resolved_by = ?, resolved_date = NOW()
+       WHERE complaint_id = ? AND status = 'Pending'`, [req.user.user_id, Number(req.params.id)]);
+    if (r.affectedRows === 0) return res.status(409).json({ error: 'Only pending complaints can be resolved.' });
+    res.json({ ok: true });
+  } catch (err) { sendError(res, err, 'Failed to resolve complaint'); }
+});
+
+app.post('/admin/clubs', async (req, res) => {
+  try {
+    const name = (req.body.club_name || '').trim();
+    if (!name) return res.status(400).json({ error: 'Club name is required.' });
+    const [r] = await pool.query('INSERT INTO club (club_name) VALUES (?)', [name]);
+    res.status(201).json({ club_id: r.insertId });
+  } catch (err) { sendError(res, err, 'Failed to create club'); }
+});
+
+// rule 7: president must be a Student, advisor must be Faculty (re-checked here)
+app.put('/admin/clubs/:id', async (req, res) => {
+  try {
+    const president = req.body.president_user_id || null;
+    const advisor = req.body.faculty_user_id || null;
+    if (president) {
+      const [u] = await pool.query('SELECT role FROM users WHERE user_id = ?', [president]);
+      if (!u.length || u[0].role !== 'Student') return res.status(400).json({ error: 'President must be a student.' });
+    }
+    if (advisor) {
+      const [u] = await pool.query('SELECT role FROM users WHERE user_id = ?', [advisor]);
+      if (!u.length || u[0].role !== 'Faculty') return res.status(400).json({ error: 'Advisor must be a faculty member.' });
+    }
+    await pool.query('UPDATE club SET president_user_id = ?, faculty_user_id = ? WHERE club_id = ?',
+      [president, advisor, Number(req.params.id)]);
+    res.json({ ok: true });
+  } catch (err) { sendError(res, err, 'Failed to update club'); }
+});
+
+function checkResourceBody(b) {
+  if (!b.room_number || !b.resource_type || !b.building) throw { status: 400, message: 'Missing resource details.' };
+  if (!(Number(b.capacity) > 0)) throw { status: 400, message: 'Capacity must be greater than 0.' };
+  if (!(Number(b.floor) >= 0)) throw { status: 400, message: 'Floor must be 0 or more.' };
+  if (!['Available', 'Unavailable', 'Maintenance'].includes(b.status)) throw { status: 400, message: 'Invalid status.' };
+}
+
+app.post('/admin/resources', async (req, res) => {
+  try {
+    const b = req.body;
+    if (!b.resource_code || b.resource_code.length > 10) throw { status: 400, message: 'Invalid resource code.' };
+    checkResourceBody(b);
+    await pool.query(
+      'INSERT INTO resource (resource_code, room_number, resource_type, building, capacity, `floor`, status) VALUES (?,?,?,?,?,?,?)',
+      [b.resource_code, b.room_number, b.resource_type, b.building, b.capacity, b.floor, b.status]);
+    res.status(201).json({ ok: true });
+  } catch (err) { sendError(res, err, 'Failed to add resource'); }
+});
+
+app.put('/admin/resources/:code', async (req, res) => {
+  try {
+    const b = req.body;
+    checkResourceBody(b);
+    const [r] = await pool.query(
+      'UPDATE resource SET room_number=?, resource_type=?, building=?, capacity=?, `floor`=?, status=? WHERE resource_code=?',
+      [b.room_number, b.resource_type, b.building, b.capacity, b.floor, b.status, req.params.code]);
+    if (r.affectedRows === 0) return res.status(404).json({ error: 'Resource not found.' });
+    res.json({ ok: true });
+  } catch (err) { sendError(res, err, 'Failed to update resource'); }
+});
+
+// timetable upload: all rows or none
+app.post('/admin/timetable', async (req, res) => {
+  const rows = req.body.rows;
+  if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'No rows to upload.' });
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    for (const t of rows) {
+      const [d] = await conn.query('SELECT department_id FROM department WHERE department_code = ?', [t.department_code]);
+      if (!d.length) throw { status: 400, message: 'Unknown department ' + t.department_code };
+      await conn.query(
+        'INSERT INTO timetable (subject_code, `day`, start_time, end_time, department_id, resource_code) VALUES (?,?,?,?,?,?)',
+        [t.subject_code, t.day, t.start_time, t.end_time, d[0].department_id, t.resource_code]);
+    }
+    await conn.commit();
+    res.status(201).json({ count: rows.length });
+  } catch (err) {
+    await conn.rollback();
+    sendError(res, err, 'Failed to upload timetable');
+  } finally { conn.release(); }
 });
 
 const PORT = process.env.PORT || 3000;
