@@ -1,12 +1,46 @@
-// Temporary hardcoded data
-const currentBookings = [
-  { resource_code: "LHC002", resource_type: "Lecture Hall", building: "LHC Complex", capacity: 200, status: "Pending", booking_date: "2026-09-27", slots: ["1:00 PM - 2:00 PM"], purpose: "Guest lecture" },
-  { resource_code: "1AB102", resource_type: "Computer Lab", building: "AB1", capacity: 60, status: "Approved", booking_date: "2026-11-08", slots: ["3:00 PM - 4:00 PM", "4:00 PM - 5:00 PM"], purpose: "Coding workshop" }
-];
+let currentBookings = [];
+let bookingHistory = [];
 
-const bookingHistory = [
-  { resource_code: "2AB016", resource_type: "Classroom", building: "AB2", capacity: 80, booking_date: "2026-12-25", slots: ["10:00 AM - 11:00 AM"], purpose: "Club meeting" }
-];
+function todayISO() {
+  const n = new Date();
+  return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+}
+
+// "09:00:00" or "09:00:00.000000" -> "9:00 AM"
+function to12(t) {
+  const parts = t.slice(0, 8).split(':');
+  let h = Number(parts[0]);
+  const period = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + parts[1] + ' ' + period;
+}
+
+// "9:00 AM" -> "09:00:00"
+function to24(str) {
+  const [time, period] = str.split(' ');
+  let [h, m] = time.split(':').map(Number);
+  if (period === 'PM' && h < 12) h += 12;
+  if (period === 'AM' && h === 12) h = 0;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':00';
+}
+
+async function loadBookings() {
+  const res = await fetch('/bookings');
+  const data = await res.json();
+  const today = todayISO();
+  currentBookings = [];
+  bookingHistory = [];
+
+  data.forEach(function (b) {
+    b.slots = b.slots
+      .filter(function (s) { return s.start_time; })
+      .sort(function (a, c) { return a.start_time.localeCompare(c.start_time); })
+      .map(function (s) { return to12(s.start_time) + ' - ' + to12(s.end_time); });
+
+    const active = (b.status === 'Pending' || b.status === 'Approved') && b.booking_date >= today;
+    (active ? currentBookings : bookingHistory).push(b);
+  });
+}
 
 let originalSlots = [];
 let originalPurpose = '';
@@ -30,6 +64,10 @@ function formatHour(hour) {
 
 function renderBookingCards(list, gridId, isCurrent) {
   const grid = document.querySelector('#' + gridId);
+  if (list.length === 0) {
+    grid.innerHTML = '<p class="empty-section-msg">No bookings here.</p>';
+    return;
+  }
   let html = '';
   list.forEach(function (b) {
     html += `
@@ -38,8 +76,8 @@ function renderBookingCards(list, gridId, isCurrent) {
         <p>${b.resource_type}</p>
         <p>${b.building}</p>
         <p>Capacity: ${b.capacity}</p>
-        ${isCurrent ? `<p>Booking Status: <span class="status-tag status-${b.status.toLowerCase()}">${b.status}</span></p>` : ''}
-        <a class="view-details-link" data-code="${b.resource_code}">${isCurrent ? 'View/Edit Booking Details' : 'View Booking Details'}</a>
+        <p>Booking Status: <span class="status-tag status-${b.status.toLowerCase()}">${b.status}</span></p>
+        <a class="view-details-link" data-id="${b.booking_id}">${isCurrent ? 'View/Edit Booking Details' : 'View Booking Details'}</a>
       </div>
     `;
   });
@@ -94,8 +132,8 @@ function setupCurrentBookingModal() {
 
   grid.addEventListener('click', function (event) {
     if (event.target.classList.contains('view-details-link')) {
-      const code = event.target.getAttribute('data-code');
-      activeBooking = currentBookings.find(function (b) { return b.resource_code === code; });
+      const id = Number(event.target.getAttribute('data-id'));
+      activeBooking = currentBookings.find(function (b) { return b.booking_id === id; });
 
       document.querySelector('#current-modal-code').textContent = activeBooking.resource_code;
       document.querySelector('#current-modal-type').textContent = activeBooking.resource_type;
@@ -132,7 +170,7 @@ function setupCurrentBookingModal() {
     if (event.target === overlay) overlay.classList.remove('open');
   });
 
-  document.querySelector('#save-changes-button').addEventListener('click', function () {
+  document.querySelector('#save-changes-button').addEventListener('click', async function () {
     const selected = document.querySelectorAll('#edit-slot-options .slot-option.selected');
     const purpose = document.querySelector('#edit-purpose-input').value.trim();
     const date = document.querySelector('#edit-date-input').value;
@@ -143,15 +181,47 @@ function setupCurrentBookingModal() {
       return;
     }
 
-    activeBooking.slots = Array.from(selected).map(function (btn) { return btn.getAttribute('data-slot'); });
-    activeBooking.purpose = purpose;
-    activeBooking.booking_date = date;
-    activeBooking.status = 'Pending';
+    const slots = Array.from(selected).map(function (btn) {
+      const parts = btn.getAttribute('data-slot').split(' - ');
+      return { start_time: to24(parts[0]), end_time: to24(parts[1]) };
+    });
 
+    const res = await fetch('/bookings/' + activeBooking.booking_id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_date: date, purpose: purpose, slots: slots })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      document.querySelector('#validation-message').textContent = data.error;
+      document.querySelector('#validation-modal-overlay').classList.add('open');
+      return;
+    }
+
+    await loadBookings();
     renderAllBookings();
     overlay.classList.remove('open');
     savedOverlay.classList.add('open');
   });
+
+  // Cancel button: first add <button id="cancel-booking-button">Cancel Booking</button> next to Save in bookings.html
+  const cancelBtn = document.querySelector('#cancel-booking-button');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', async function () {
+      if (!confirm('Cancel this booking?')) return;
+      const res = await fetch('/bookings/' + activeBooking.booking_id + '/cancel', { method: 'PUT' });
+      const data = await res.json();
+      if (!res.ok) {
+        document.querySelector('#validation-message').textContent = data.error;
+        document.querySelector('#validation-modal-overlay').classList.add('open');
+        return;
+      }
+      await loadBookings();
+      renderAllBookings();
+      overlay.classList.remove('open');
+    });
+  }
 
   savedOverlay.addEventListener('click', function (event) {
     if (event.target === savedOverlay) savedOverlay.classList.remove('open');
@@ -174,8 +244,8 @@ function setupHistoryModal() {
 
   grid.addEventListener('click', function (event) {
     if (event.target.classList.contains('view-details-link')) {
-      const code = event.target.getAttribute('data-code');
-      const booking = bookingHistory.find(function (b) { return b.resource_code === code; });
+      const id = Number(event.target.getAttribute('data-id'));
+      const booking = bookingHistory.find(function (b) { return b.booking_id === id; });
 
       document.querySelector('#history-modal-code').textContent = booking.resource_code;
       document.querySelector('#history-modal-type').textContent = booking.resource_type;
@@ -212,8 +282,12 @@ function checkForChanges() {
   document.querySelector('#save-changes-button').disabled = !(slotsChanged || purposeChanged || dateChanged);
 }
 
-renderAllBookings();
-setupCurrentBookingModal();
-setupHistoryModal();
-setupEditSlotDropdown();
-applyAccessGate();
+async function init() {
+  await loadBookings();
+  renderAllBookings();
+  setupCurrentBookingModal();
+  setupHistoryModal();
+  setupEditSlotDropdown();
+  applyAccessGate();
+}
+init();
