@@ -21,7 +21,7 @@ app.get('/resources', async (req, res) => {
 
 // TEMPORARY until Microsoft login exists: pretend this user is logged in
 // 2 = Aarav (club president), 5 = Rohit (faculty), 1 = Meera (admin)
-const CURRENT_USER_ID = 1;
+const CURRENT_USER_ID = 2;
 
 async function getCurrentUser() {
   const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [CURRENT_USER_ID]);
@@ -101,17 +101,65 @@ app.get('/bookings', async (req, res) => {
 });
 
 // ---------- my complaints ----------
+// ---------- my complaints ----------
 app.get('/complaints', async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT complaint_id, title, description, resource_code, status, created_date, resolved_date
-       FROM complaint WHERE user_id = ? ORDER BY created_date DESC`,
-      [CURRENT_USER_ID]
+      `SELECT complaint_id, title, description, resource_code, status,
+              DATE(created_date) AS created_date, DATE(resolved_date) AS resolved_date
+       FROM complaint WHERE user_id = ? ORDER BY complaint_id DESC`,
+      [req.user.user_id]
     );
     res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch complaints' });
+  }
+});
+
+// ---------- file a complaint ----------
+app.post('/complaints', async (req, res) => {
+  try {
+    const { resource_code, title, description } = req.body;
+    if (!resource_code || !title?.trim() || !description?.trim()) {
+      return res.status(400).json({ error: 'Missing complaint details.' });
+    }
+    const [r] = await pool.query('SELECT 1 FROM resource WHERE resource_code = ?', [resource_code]);
+    if (r.length === 0) return res.status(404).json({ error: 'Resource not found.' });
+
+    const [result] = await pool.query(
+      'INSERT INTO complaint (title, description, resource_code, user_id) VALUES (?, ?, ?, ?)',
+      [title.trim(), description.trim(), resource_code, req.user.user_id]
+    );
+    res.status(201).json({ complaint_id: result.insertId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to file complaint' });
+  }
+});
+
+// ---------- edit my complaint (rule 9: own + still Pending) ----------
+app.put('/complaints/:id', async (req, res) => {
+  try {
+    const { resource_code, title, description } = req.body;
+    if (!resource_code || !title?.trim() || !description?.trim()) {
+      return res.status(400).json({ error: 'Missing complaint details.' });
+    }
+    const [r] = await pool.query('SELECT 1 FROM resource WHERE resource_code = ?', [resource_code]);
+    if (r.length === 0) return res.status(404).json({ error: 'Resource not found.' });
+
+    const [result] = await pool.query(
+      `UPDATE complaint SET resource_code = ?, title = ?, description = ?
+       WHERE complaint_id = ? AND user_id = ? AND status = 'Pending'`,
+      [resource_code, title.trim(), description.trim(), Number(req.params.id), req.user.user_id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(409).json({ error: 'Only your own pending complaints can be edited.' });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update complaint' });
   }
 });
 
