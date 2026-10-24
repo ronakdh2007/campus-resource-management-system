@@ -28,6 +28,10 @@ ADD CONSTRAINT chk_complaint_resolved CHECK(
     OR (status='Pending' AND resolved_date IS NULL)
 );
 
+-- every phone number must follow the indian 10 digit standard
+ALTER TABLE users
+ADD CONSTRAINT chk_users_phone CHECK (phone IS NULL OR phone REGEXP '^[6-9][0-9]{9}$');
+
 -- prints the exact CREATE TABLE statement that would be required to rebuild that table in the current state
 SHOW CREATE TABLE resource;
 SHOW CREATE TABLE timetable;
