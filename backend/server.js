@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-only-secret',
@@ -649,12 +649,24 @@ app.post('/admin/timetable', async (req, res) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    const deptIds = new Map(); // department_code -> department_id, looked up once each
     for (const t of rows) {
-      const [d] = await conn.query('SELECT department_id FROM department WHERE department_code = ?', [t.department_code]);
-      if (!d.length) throw { status: 400, message: 'Unknown department ' + t.department_code };
+      if (!deptIds.has(t.department_code)) {
+        const [d] = await conn.query('SELECT department_id FROM department WHERE department_code = ?', [t.department_code]);
+        if (!d.length) throw { status: 400, message: 'Unknown department ' + t.department_code };
+        deptIds.set(t.department_code, d[0].department_id);
+      }
+      const deptId = deptIds.get(t.department_code);
+      const args = [t.subject_code, t.day, t.start_time, t.end_time, deptId, t.resource_code];
+
+      const [dup] = await conn.query(
+        'SELECT 1 FROM timetable WHERE subject_code = ? AND `day` = ? AND start_time = ? AND end_time = ? AND department_id = ? AND resource_code = ? LIMIT 1', args);
+      if (dup.length) {
+        throw { status: 409, message: 'Already in the timetable (or repeated in the file): '
+          + t.subject_code + ' ' + t.day + ' ' + t.start_time + '-' + t.end_time + ' ' + t.resource_code };
+      }
       await conn.query(
-        'INSERT INTO timetable (subject_code, `day`, start_time, end_time, department_id, resource_code) VALUES (?,?,?,?,?,?)',
-        [t.subject_code, t.day, t.start_time, t.end_time, d[0].department_id, t.resource_code]);
+        'INSERT INTO timetable (subject_code, `day`, start_time, end_time, department_id, resource_code) VALUES (?,?,?,?,?,?)', args);
     }
     await conn.commit();
     res.status(201).json({ count: rows.length });
