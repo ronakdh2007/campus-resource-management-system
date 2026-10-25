@@ -4,6 +4,11 @@ let me = null;
 
 async function loadMe() {
   const res = await fetch('/me');
+  if (res.status === 401) {
+    // not logged in: go to login and never resolve, so nothing else on the page runs
+    window.location.replace('/pages/login.html');
+    return new Promise(function () {});
+  }
   me = await res.json();
   canAccess = me.canAccess;
   isAdmin = me.isAdmin;
@@ -157,8 +162,8 @@ function applyAdminGate() {
 function setupSignOut() {
   const btn = document.querySelector('.signout-button');
   if (!btn) return;
-  btn.addEventListener('click', function () {
-    // with real login, call fetch('/logout', { method: 'POST' }) here first
+  btn.addEventListener('click', async function () {
+    await fetch('/logout', { method: 'POST' });
     window.location.href = '/pages/login.html';
   });
 }

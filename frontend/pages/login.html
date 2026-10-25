@@ -23,8 +23,21 @@
     <div class="login-card-container">
       <div class="login-card">
         <h2 class="welcome-heading">Welcome Back</h2>
-        <p class="instruction-para">Use your college Outlook Account to continue</p>
-        <button class="microsoft-sign-in" id="ms-signin-btn">Sign in with Microsoft</button>
+        <p class="instruction-para">Sign in with your college email. We will send you a one-time code.</p>
+
+        <div id="email-step" class="login-form">
+          <input type="email" id="login-email" class="login-input" placeholder="name@muj.manipal.edu" autocomplete="email">
+          <button class="login-btn" id="send-code-btn">Send code</button>
+        </div>
+
+        <div id="code-step" class="login-form hidden">
+          <p id="code-sent-msg" class="code-sent-msg"></p>
+          <input type="text" id="login-code" class="login-input" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code">
+          <button class="login-btn" id="verify-code-btn">Verify and sign in</button>
+          <button class="login-link-btn" id="change-email-btn">Use a different email</button>
+        </div>
+
+        <p id="login-error" class="login-error"></p>
       </div>
     </div>
     
@@ -32,5 +45,6 @@
     
   </div>
   
+  <script src="../js/login.js"></script>
 </body>
 </html>

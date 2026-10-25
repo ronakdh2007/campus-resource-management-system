@@ -99,7 +99,7 @@ p{
   margin: 1rem;
 }
 
-.microsoft-sign-in{
+.login-btn{
   font-family: Inter, sans-serif;
   font-weight: 600;
   color: white;
@@ -107,16 +107,17 @@ p{
   border: none;
   padding: 0.75em;
   border-radius: 0.75em;
+  width: 100%;
   transition: background-color 0.25s, box-shadow 0.25s;
 }
 
-.microsoft-sign-in:hover{
+.login-btn:hover{
   cursor: pointer;
   background-color: rgb(43, 141, 216);
   box-shadow: 0px 0px 6px rgb(0, 0, 0, 0.5);
 }
 
-.microsoft-sign-in:active{
+.login-btn:active{
   background-color: rgb(97, 175, 235);
 }
 
@@ -131,4 +132,69 @@ p{
 
 .footer-credit:hover{
   color: rgb(236, 236, 236);
+}
+
+.hidden{
+  display: none !important;
+}
+
+.login-form{
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  width: 18em;
+}
+
+.instruction-para{
+  max-width: 18em;
+  text-align: center;
+}
+
+.login-input{
+  font-family: Inter, sans-serif;
+  font-size: 1em;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgb(90, 90, 90);
+  border-radius: 0.75em;
+  padding: 0.75em;
+  outline: none;
+  transition: border-color 0.25s;
+}
+
+.login-input:focus{
+  border-color: rgb(0, 120, 212);
+}
+
+.login-input::placeholder{
+  color: rgb(150, 150, 150);
+}
+
+.code-sent-msg{
+  margin: 0;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.login-link-btn{
+  font-family: Inter, sans-serif;
+  background: none;
+  border: none;
+  color: rgb(148, 148, 148);
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: color 0.25s;
+}
+
+.login-link-btn:hover{
+  color: white;
+}
+
+.login-error{
+  min-height: 1.2em;
+  margin: 0.75em 0 0 0;
+  font-size: 0.9em;
+  text-align: center;
+  max-width: 18em;
+  color: rgb(255, 110, 110);
 }
