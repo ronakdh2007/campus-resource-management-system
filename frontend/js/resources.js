@@ -40,6 +40,47 @@ function to24(t) { // "9:00 AM" -> "09:00:00"
   return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':00';
 }
 
+let availabilityToken = 0;
+
+function updateSlotLabel() {
+  const n = document.querySelectorAll('.slot-option.selected').length;
+  document.querySelector('#slot-dropdown-toggle').textContent = n === 0 ? 'Select Time Slot(s)' : n + ' slot(s) selected';
+}
+
+function toMinutes(hhmm) { // "13:10" -> 790
+  const p = hhmm.split(':');
+  return Number(p[0]) * 60 + Number(p[1]);
+}
+
+// grey out the slots that clash with a class or an approved booking on the chosen date
+async function refreshSlotAvailability() {
+  const myToken = ++availabilityToken;
+  const code = document.querySelector('#modal-room-code').textContent;
+  const date = document.querySelector('#date-input').value;
+  let blocked = [];
+
+  if (date) {
+    const res = await fetch('/availability?resource_code=' + encodeURIComponent(code) + '&date=' + date);
+    if (myToken !== availabilityToken) return; // a newer request replaced this one
+    if (res.ok) {
+      const data = await res.json();
+      data.classes.forEach(function (r) { blocked.push({ start: r.start_time, end: r.end_time, why: 'Class scheduled' }); });
+      data.booked.forEach(function (r) { blocked.push({ start: r.start_time, end: r.end_time, why: 'Already booked' }); });
+    }
+  }
+
+  document.querySelectorAll('.slot-option').forEach(function (btn) {
+    const parts = btn.dataset.slot.split(' - ');
+    const start = toMinutes(to24(parts[0]));
+    const end = toMinutes(to24(parts[1]));
+    const hit = blocked.find(function (b) { return toMinutes(b.start) < end && toMinutes(b.end) > start; });
+    btn.disabled = !!hit;
+    btn.title = hit ? hit.why : '';
+    if (hit) btn.classList.remove('selected');
+  });
+  updateSlotLabel();
+}
+
 // For resource modal
 function setupResourceModal() {
   const grid = document.querySelector('#resource-grid');
@@ -66,6 +107,7 @@ function setupResourceModal() {
       document.querySelector('#purpose-input').value = '';
       
       document.querySelector('#date-input').value = '';
+      refreshSlotAvailability();
 
       detailsOverlay.classList.add('open');
     }
@@ -178,20 +220,14 @@ function setupSlotDropdown() {
   });
 
   optionsWrapper.addEventListener('click', function (event) {
-    if (event.target.classList.contains('slot-option')) {
+    if (event.target.classList.contains('slot-option') && !event.target.disabled) {
       event.target.classList.toggle('selected');
-      updateToggleLabel();
+      updateSlotLabel();
     }
   });
 
-  function updateToggleLabel() {
-    const selected = document.querySelectorAll('.slot-option.selected');
-    if (selected.length === 0) {
-      toggle.textContent = 'Select Time Slot(s)';
-    } else {
-      toggle.textContent = selected.length + ' slot(s) selected';
-    }
-  }
+  // new: when the date changes, re-check which slots are free
+  document.querySelector('#date-input').addEventListener('change', refreshSlotAvailability);
 
   document.addEventListener('click', function (event) {
     if (!container.contains(event.target)) {
