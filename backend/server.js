@@ -30,6 +30,31 @@ app.get('/resources', attachUser, requireBooker, async (req, res) => {
   }
 });
 
+// which 1-hour slots are taken for a room on a date: timetable classes + Approved bookings
+app.get('/availability', attachUser, requireBooker, async (req, res) => {
+  try {
+    const { resource_code, date } = req.query;
+    if (!resource_code || !/^\d{4}-\d{2}-\d{2}$/.test(date || '')) {
+      return res.status(400).json({ error: 'Room and date are required.' });
+    }
+    const [booked] = await pool.query(
+      `SELECT TIME_FORMAT(bs.start_time, '%H:%i') AS start_time, TIME_FORMAT(bs.end_time, '%H:%i') AS end_time
+       FROM booking_request b JOIN booking_slot bs ON bs.booking_id = b.booking_id
+       WHERE b.resource_code = ? AND b.booking_date = ? AND b.status = 'Approved'`,
+      [resource_code, date]
+    );
+    const [classes] = await pool.query(
+      `SELECT TIME_FORMAT(start_time, '%H:%i') AS start_time, TIME_FORMAT(end_time, '%H:%i') AS end_time
+       FROM timetable WHERE resource_code = ? AND \`day\` = DAYNAME(?)`,
+      [resource_code, date]
+    );
+    res.json({ booked, classes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load availability' });
+  }
+});
+
 // ---------- login with email OTP ----------
 const OTP_TTL_MS = 5 * 60 * 1000;
 const otpStore = new Map(); // email -> { code, expires, attempts, sentAt } (in memory)
