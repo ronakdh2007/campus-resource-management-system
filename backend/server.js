@@ -49,11 +49,21 @@ function nameFromEmail(email) {
   return (name || 'New User').slice(0, 100);
 }
 
+const STUDENT_EMAIL = /^[a-z]+\.\d{10}@muj\.manipal\.edu$/;            // firstname.1234567890@muj.manipal.edu
+const FACULTY_EMAIL = /^[a-z]+(\.[a-z]+)+@jaipur\.manipal\.edu$/;      // first.last@jaipur.manipal.edu
+
+function validCollegeEmail(email) {
+  return STUDENT_EMAIL.test(email) || FACULTY_EMAIL.test(email);
+}
+
 app.post('/auth/request-otp', async (req, res) => {
   try {
     const email = cleanEmail(req.body.email);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !roleForEmail(email)) {
-      return res.status(400).json({ error: 'Use your @muj.manipal.edu or @jaipur.manipal.edu email.' });
+    const [known] = await pool.query('SELECT 1 FROM users WHERE email = ?', [email]);
+    if (!validCollegeEmail(email) && known.length === 0) {
+      return res.status(400).json({
+        error: 'Use your college email: firstName.regNum@muj.manipal.edu (for students) or firstName.lastName@jaipur.manipal.edu (for faculty).'
+      });
     }
     const old = otpStore.get(email);
     if (old && Date.now() - old.sentAt < 30000) {
