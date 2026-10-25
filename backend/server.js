@@ -659,6 +659,31 @@ app.post('/admin/timetable', async (req, res) => {
   } finally { conn.release(); }
 });
 
+app.put('/admin/users/:id/role', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const role = req.body.role;
+    if (!['Student', 'Faculty', 'Admin'].includes(role)) return res.status(400).json({ error: 'Invalid role.' });
+
+    const [u] = await pool.query('SELECT role FROM users WHERE user_id = ?', [id]);
+    if (!u.length) return res.status(404).json({ error: 'User not found.' });
+    if (u[0].role === 'Admin') return res.status(403).json({ error: 'An admin\'s role cannot be changed.' });
+    if (u[0].role === role) return res.json({ ok: true });
+
+    if (u[0].role === 'Student') {
+      const [c] = await pool.query('SELECT 1 FROM club WHERE president_user_id = ?', [id]);
+      if (c.length) return res.status(409).json({ error: 'This student is a club president. Remove them from the club first.' });
+    }
+    if (u[0].role === 'Faculty') {
+      const [c] = await pool.query('SELECT 1 FROM club WHERE faculty_user_id = ?', [id]);
+      if (c.length) return res.status(409).json({ error: 'This faculty member is a club advisor. Remove them from the club first.' });
+    }
+
+    await pool.query("UPDATE users SET role = ? WHERE user_id = ? AND role <> 'Admin'", [role, id]);
+    res.json({ ok: true });
+  } catch (err) { sendError(res, err, 'Failed to change role'); }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
