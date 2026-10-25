@@ -2,14 +2,25 @@ const express = require('express');
 const path = require('path');
 const pool = require('./db');
 
+const session = require('express-session');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
 const app = express();
 app.use(express.json());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-only-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { httpOnly: true, sameSite: 'lax', maxAge: 8 * 60 * 60 * 1000 }
+}));
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 app.get('/', (req, res) => res.redirect('/pages/login.html'));
 
-app.get('/resources', async (req, res) => {
+app.get('/resources', attachUser, requireBooker, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM resource');
     res.json(rows);
@@ -19,20 +30,108 @@ app.get('/resources', async (req, res) => {
   }
 });
 
-// TEMPORARY until Microsoft login exists: pretend this user is logged in
-// 2 = Aarav (club president), 5 = Rohit (faculty), 1 = Meera (admin)
-const CURRENT_USER_ID = 1;
+// ---------- login with email OTP ----------
+const OTP_TTL_MS = 5 * 60 * 1000;
+const otpStore = new Map(); // email -> { code, expires, attempts, sentAt } (in memory)
+const DOMAIN_ROLE = { 'muj.manipal.edu': 'Student', 'jaipur.manipal.edu': 'Faculty' };
 
-async function getCurrentUser() {
-  const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [CURRENT_USER_ID]);
-  return rows[0];
+const mailer = process.env.OTP_MODE === 'email'
+  ? nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS } })
+  : null;
+
+function cleanEmail(v) { return String(v || '').trim().toLowerCase(); }
+function roleForEmail(email) { return DOMAIN_ROLE[email.split('@')[1]]; }
+
+// "ramesh.kumar@..." -> "Ramesh Kumar", "aarav.2410101001@..." -> "Aarav"
+function nameFromEmail(email) {
+  const parts = email.split('@')[0].split('.').filter(p => /^[a-z]+$/.test(p));
+  const name = parts.map(p => p[0].toUpperCase() + p.slice(1)).join(' ');
+  return (name || 'New User').slice(0, 100);
 }
+
+app.post('/auth/request-otp', async (req, res) => {
+  try {
+    const email = cleanEmail(req.body.email);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !roleForEmail(email)) {
+      return res.status(400).json({ error: 'Use your @muj.manipal.edu or @jaipur.manipal.edu email.' });
+    }
+    const old = otpStore.get(email);
+    if (old && Date.now() - old.sentAt < 30000) {
+      return res.status(429).json({ error: 'Please wait 30 seconds before requesting another code.' });
+    }
+    const code = String(crypto.randomInt(100000, 1000000));
+    otpStore.set(email, { code, expires: Date.now() + OTP_TTL_MS, attempts: 0, sentAt: Date.now() });
+
+    if (mailer) {
+      await mailer.sendMail({
+        from: 'ResManager <' + process.env.MAIL_USER + '>',
+        to: email,
+        subject: 'Your ResManager login code',
+        text: 'Your code is ' + code + '. It expires in 5 minutes.'
+      });
+    } else {
+      console.log('[DEV OTP] ' + email + ' -> ' + code);
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Could not send the code.' });
+  }
+});
+
+app.post('/auth/verify-otp', async (req, res) => {
+  try {
+    const email = cleanEmail(req.body.email);
+    const code = String(req.body.code || '').trim();
+    const entry = otpStore.get(email);
+
+    if (!entry || Date.now() > entry.expires) {
+      otpStore.delete(email);
+      return res.status(400).json({ error: 'Code expired. Please request a new one.' });
+    }
+    entry.attempts++;
+    if (entry.attempts > 5) {
+      otpStore.delete(email);
+      return res.status(429).json({ error: 'Too many wrong attempts. Request a new code.' });
+    }
+    if (entry.code !== code) return res.status(400).json({ error: 'Wrong code.' });
+    otpStore.delete(email); // a code works only once
+
+    // existing user keeps their role (this is how Admin works); a new user gets the role from the domain
+    const [found] = await pool.query('SELECT user_id, role FROM users WHERE email = ?', [email]);
+    let user = found[0];
+    if (!user) {
+      const role = roleForEmail(email);
+      const [ins] = await pool.query('INSERT INTO users (name, email, role) VALUES (?, ?, ?)',
+        [nameFromEmail(email), email, role]);
+      user = { user_id: ins.insertId, role: role };
+    }
+
+    req.session.regenerate(function (err) {
+      if (err) return res.status(500).json({ error: 'Login failed.' });
+      req.session.user_id = user.user_id;
+      res.json({ ok: true, redirect: user.role === 'Admin' ? '/pages/admin.html' : '/pages/dashboard.html' });
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Login failed.' });
+  }
+});
+
+app.post('/logout', function (req, res) {
+  req.session.destroy(function () {
+    res.clearCookie('connect.sid');
+    res.json({ ok: true });
+  });
+});
 
 // ---------- access control : enforced on the server, not just the frontend ----------
 async function attachUser(req, res, next) {
   try {
-    req.user = await getCurrentUser();
-    if (!req.user) return res.status(401).json({ error: 'Not logged in.' });
+    if (!req.session.user_id) return res.status(401).json({ error: 'Not logged in.' });
+    const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [req.session.user_id]);
+    if (!rows[0]) return res.status(401).json({ error: 'Not logged in.' });
+    req.user = rows[0];
     next();
   } catch (err) {
     console.error(err);
@@ -124,7 +223,7 @@ app.get('/bookings', async (req, res) => {
        WHERE b.user_id = ?
        GROUP BY b.booking_id
        ORDER BY b.booking_date DESC`,
-      [CURRENT_USER_ID]
+      [req.user.user_id]
     );
     res.json(rows);
   } catch (err) {
@@ -201,7 +300,7 @@ app.post('/bookings', async (req, res) => {
   const { resource_code, booking_date, purpose, slots } = req.body;
   const conn = await pool.getConnection();
   try {
-    const user = await getCurrentUser();
+    const user = req.user;
 
     // rule 2: who may book. Faculty always, a student only if a club president, admin never
     let clubId = null;
@@ -311,7 +410,7 @@ app.put('/bookings/:id', async (req, res) => {
     // only my own booking, and lock it
     const [rows] = await conn.query(
       'SELECT resource_code, status FROM booking_request WHERE booking_id = ? AND user_id = ? FOR UPDATE',
-      [bookingId, CURRENT_USER_ID]
+      [bookingId, req.user.user_id]
     );
     if (rows.length === 0) throw { status: 404, message: 'Booking not found.' };
     if (!['Pending', 'Approved'].includes(rows[0].status)) {
@@ -353,7 +452,7 @@ app.put('/bookings/:id/cancel', async (req, res) => {
     const [result] = await pool.query(
       `UPDATE booking_request SET status = 'Cancelled'
        WHERE booking_id = ? AND user_id = ? AND status IN ('Pending','Approved')`,
-      [Number(req.params.id), CURRENT_USER_ID]
+      [Number(req.params.id), req.user.user_id]
     );
     if (result.affectedRows === 0) return res.status(409).json({ error: 'Booking cannot be cancelled.' });
     res.json({ ok: true });
