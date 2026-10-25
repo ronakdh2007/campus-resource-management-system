@@ -72,16 +72,21 @@ app.post('/auth/request-otp', async (req, res) => {
     const code = String(crypto.randomInt(100000, 1000000));
     otpStore.set(email, { code, expires: Date.now() + OTP_TTL_MS, attempts: 0, sentAt: Date.now() });
 
-    if (mailer) {
-      await mailer.sendMail({
-        from: 'ResManager <' + process.env.MAIL_USER + '>',
-        to: email,
-        subject: 'Your ResManager login code',
-        text: 'Your code is ' + code + '. It expires in 5 minutes.'
-      });
-    } else {
-      console.log('[DEV OTP] ' + email + ' -> ' + code);
-    }
+        if (mailer) {
+          try {
+            await mailer.sendMail({
+              from: 'ResManager <' + process.env.MAIL_USER + '>',
+              to: email,
+              subject: 'Your ResManager login code',
+              text: 'Your code is ' + code + '. It expires in 5 minutes.'
+            });
+          } catch (mailErr) {
+            otpStore.delete(email); // failed send must not block a retry for 30 s
+            throw mailErr;          // the outer catch sends the 500
+          }
+        } else {
+          console.log('[DEV OTP] ' + email + ' -> ' + code);
+        }
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
