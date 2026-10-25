@@ -77,10 +77,65 @@ function setupAdminSidebarLink(){
 }
 
 // Admin lands on admin.html (profile stays reachable from the header dropdown)
-function redirectAdminHome() {
-  if (!isAdmin) return;
+// Which pages each kind of user may open
+function pageAllowed(page) {
+  if (page === 'admin.html') return isAdmin;
+  if (page === 'resources.html' || page === 'bookings.html' || page === 'complaints.html') return canAccess;
+  if (page === 'dashboard.html') return !isAdmin;
+  return true; // profile and anything else
+}
+
+function homePage() {
+  return isAdmin ? 'admin.html' : 'dashboard.html';
+}
+
+// Returns true if the user may stay on this page, otherwise redirects and returns false
+function enforcePageAccess() {
   const page = window.location.pathname.split('/').pop();
-  if (page !== 'admin.html' && page !== 'profile.html') window.location.replace('admin.html');
+  if (pageAllowed(page)) return true;
+
+  let target = homePage();
+  try {
+    const ref = new URL(document.referrer);
+    const refPage = ref.pathname.split('/').pop();
+    if (ref.origin === window.location.origin && refPage.endsWith('.html')
+        && refPage !== page && refPage !== 'login.html' && pageAllowed(refPage)) {
+      target = refPage; // send them back to where they came from
+    }
+  } catch (e) { /* no referrer (typed URL): use the home page */ }
+
+  rememberDenied(page);
+  window.location.replace(target);
+  return false;
+}
+
+const PAGE_NAMES = {
+  'admin.html': 'the Admin page',
+  'resources.html': 'Resources',
+  'bookings.html': 'Bookings',
+  'complaints.html': 'Complaints',
+  'dashboard.html': 'the Dashboard'
+};
+
+// The redirect happens on one page and the message shows on the next, so we pass it through sessionStorage
+function rememberDenied(page) {
+  try { sessionStorage.setItem('accessDenied', PAGE_NAMES[page] || 'that page'); } catch (e) {}
+}
+
+function showAccessToast() {
+  let what = null;
+  try {
+    what = sessionStorage.getItem('accessDenied');
+    sessionStorage.removeItem('accessDenied');
+  } catch (e) {}
+  if (!what) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'access-toast';
+  toast.textContent = 'You do not have access to ' + what + '.';
+  document.body.appendChild(toast);
+  setTimeout(function () { toast.classList.add('access-toast-hide'); }, 4000);
+  setTimeout(function () { toast.remove(); }, 4600);
 }
 
 // Students who are not presidents only keep Dashboard and Profile in the sidebar
@@ -175,11 +230,12 @@ setupSignOut();
 // everything that needs to know the role waits for /me
 async function initCommon() {
   await loadMe();
-  redirectAdminHome();
+  if (!enforcePageAccess()) return new Promise(function () {}); // never resolves, so no page script runs
   setupAdminSidebarLink();
   trimSidebarForStudents();
   setupActiveSidebarLink();
   applyAdminGate();
   applyUserName();
+  showAccessToast();
 }
 const commonReady = initCommon();
