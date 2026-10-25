@@ -33,6 +33,8 @@ p{
   font-family: 'Inter Tight', sans-serif;
 }
 
+.hidden { display: none !important; }
+
 .header-bar{
   display: flex;
   height: 2em;

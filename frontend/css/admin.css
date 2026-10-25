@@ -295,3 +295,22 @@
   font-weight: normal;
   margin-left: 0.4em;
 }
+
+/* Users tab */
+.users-layout { display: flex; gap: 1.5em; align-items: flex-start; }
+.users-main { flex: 1; min-width: 0; }
+.users-main .admin-input { margin: 0 0 1em 0; }
+.users-filters {
+  width: 14em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  background-color: rgb(20, 20, 20);
+  border: 1px solid rgb(44, 44, 44);
+  border-radius: 0.75em;
+  padding: 1em;
+}
+.users-filters .admin-select { margin-top: 0; }
+.users-filters .book-button { margin-top: 0.75em; }
+.timetable-table .admin-select { width: auto; margin-top: 0; padding: 0.3em 0.5em; }
+.user-locked { color: rgb(150, 150, 150); }

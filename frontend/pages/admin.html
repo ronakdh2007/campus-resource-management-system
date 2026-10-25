@@ -100,6 +100,7 @@
       <button class="admin-tab" data-tab="clubs" id="tab-clubs">Clubs</button>
       <button class="admin-tab" data-tab="resources" id="tab-resources">Resources</button>
       <button class="admin-tab" data-tab="timetable" id="tab-timetable">Timetable</button>
+      <button class="admin-tab" id="tab-users" data-tab="users">Users</button>
     </div>
 
     <!-- TAB 1: BOOKINGS -->
@@ -186,6 +187,38 @@
             </thead>
             <tbody id="timetable-tbody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TAB 6: USERS -->
+    <div class="tab-section hidden" id="section-users">
+      <div class="dashboard-section">
+        <h2>Users <span class="timetable-count" id="user-count"></span></h2>
+        <div class="users-layout">
+          <div class="users-main">
+            <input type="text" class="admin-input" id="user-search" placeholder="Search by name or email">
+            <div class="timetable-table-wrapper">
+              <table class="timetable-table">
+                <thead>
+                  <tr><th>Name</th><th>Email</th><th>Department</th><th>Role</th></tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <aside class="users-filters">
+            <label class="detail-label" for="user-role-filter">Role</label>
+            <select class="admin-select" id="user-role-filter">
+              <option value="">All</option>
+              <option>Student</option>
+              <option>Faculty</option>
+              <option>Admin</option>
+            </select>
+            <label class="detail-label" for="user-dept-filter">Department</label>
+            <select class="admin-select" id="user-dept-filter"><option value="">All</option></select>
+            <button class="book-button" id="user-clear-filters">Clear filters</button>
+          </aside>
         </div>
       </div>
     </div>

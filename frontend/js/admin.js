@@ -40,6 +40,7 @@ async function refreshAll() {
   renderClubsTab();
   renderResourcesTab();
   renderTimetableTab();
+  renderUsersTab();
   updateBadges();
 }
 
@@ -1072,6 +1073,86 @@ function setupTimetableUpload() {
   });
 }
 
+// Escape text before putting it into innerHTML
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// Users tab: list with search and filters
+function renderUsersTab() {
+  const q = document.querySelector('#user-search').value.trim().toLowerCase();
+  const roleF = document.querySelector('#user-role-filter').value;
+  const deptF = document.querySelector('#user-dept-filter').value;
+
+  const list = users.filter(function (u) {
+    return (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
+      && (!roleF || u.role === roleF)
+      && (!deptF || String(u.department_id) === deptF);
+  });
+
+  document.querySelector('#user-count').textContent = '(' + list.length + ')';
+  const tbody = document.querySelector('#users-tbody');
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:rgb(150,150,150);">No users found.</td></tr>';
+    return;
+  }
+
+  let html = '';
+  list.forEach(function (u) {
+    const dept = findDepartment(u.department_id);
+    const roleCell = u.role === 'Admin'
+      ? '<span class="user-locked">Admin (locked)</span>'
+      : '<select class="admin-select user-role-select" data-id="' + u.user_id + '" data-old="' + u.role + '">'
+        + ['Student', 'Faculty', 'Admin'].map(function (r) {
+            return '<option' + (r === u.role ? ' selected' : '') + '>' + r + '</option>';
+          }).join('')
+        + '</select>';
+    html += '<tr><td>' + esc(u.name) + '</td><td>' + esc(u.email) + '</td><td>'
+      + (dept ? esc(dept.department_code) : '—') + '</td><td>' + roleCell + '</td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function setupUsersTab() {
+  const deptSel = document.querySelector('#user-dept-filter');
+  departments.forEach(function (d) {
+    deptSel.insertAdjacentHTML('beforeend',
+      '<option value="' + d.department_id + '">' + esc(d.department_code) + '</option>');
+  });
+
+  document.querySelector('#user-search').addEventListener('input', renderUsersTab);
+  document.querySelector('#user-role-filter').addEventListener('change', renderUsersTab);
+  deptSel.addEventListener('change', renderUsersTab);
+  document.querySelector('#user-clear-filters').addEventListener('click', function () {
+    document.querySelector('#user-search').value = '';
+    document.querySelector('#user-role-filter').value = '';
+    deptSel.value = '';
+    renderUsersTab();
+  });
+
+  document.querySelector('#users-tbody').addEventListener('change', async function (event) {
+    if (!event.target.classList.contains('user-role-select')) return;
+    const sel = event.target;
+    const id = Number(sel.getAttribute('data-id'));
+    const newRole = sel.value;
+    const warn = newRole === 'Admin'
+      ? 'Make this user an ADMIN? You will not be able to change their role afterwards.'
+      : 'Change this user\'s role to ' + newRole + '?';
+
+    if (!confirm(warn)) { sel.value = sel.getAttribute('data-old'); return; }
+
+    const r = await api('PUT', '/admin/users/' + id + '/role', { role: newRole });
+    if (!r.ok) {
+      sel.value = sel.getAttribute('data-old');
+      showValidation(r.data.error);
+      return;
+    }
+    await refreshAll();
+  });
+}
+
 // Global utility modals
 function setupUtilityModals() {
   const confirmOverlay = document.querySelector('#confirm-modal-overlay');
@@ -1103,6 +1184,7 @@ commonReady.then(async function () {
   renderClubsTab();
   renderResourcesTab();
   renderTimetableTab();
+  renderUsersTab();
   updateBadges();
 
   setupTabNavigation();
@@ -1114,4 +1196,5 @@ commonReady.then(async function () {
   setupManageClubModal();
   setupResourceModal();
   setupTimetableUpload();
+  setupUsersTab();
 });
