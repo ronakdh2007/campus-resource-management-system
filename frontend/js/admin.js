@@ -891,10 +891,10 @@ function setupTimetableUpload() {
   // Download sample CSV
   sampleLink.addEventListener('click', function (event) {
     event.preventDefault();
-    const csvContent = 'subject_code,day,start_time,end_time,department_code,resource_code\n'
-      + 'CS101,Monday,09:00,10:00,CSE,LHC002\n'
-      + 'EC201,Tuesday,11:00,12:00,ECE,2AB016\n'
-      + 'ME102,Wednesday,14:00,15:00,MECH,1AB102\n';
+        const csvContent = 'subject_code,day,start_time,end_time,department_code,resource_code\n'
+      + 'CSC2102,Monday,11:30,12:20,CSE,RLHC0201\n'
+      + 'CSC2130,Tuesday,09:50,11:30,CSE,L2AB0113\n'
+      + 'CSC2131,Tuesday,09:50,11:30,CSE,L1AB0116\n';
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
