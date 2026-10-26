@@ -6,7 +6,6 @@ ADD CONSTRAINT uq_department_code UNIQUE (department_code),
 ADD CONSTRAINT uq_department_name UNIQUE (department_name);
 
 -- users can have the same name, but must have a unique email
--- the backend finds the users by their MS email lookup, hence to avoid ambiguity, each email must be unique
 ALTER TABLE users
 ADD CONSTRAINT uq_users_email UNIQUE (email);
 
